@@ -1,0 +1,46 @@
+apply plugin: 'java'
+apply plugin: 'java-library-distribution'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+jar {
+	baseName = 'reactive-ros'
+	version = '1.0.0'
+}
+distributions {
+    main{
+        baseName = 'reactive-ros'
+    }
+}
+
+repositories {	
+	maven {
+		url "https://github.com/rosjava/rosjava_mvn_repo/raw/master/"
+	}
+	mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+dependencies {
+	compile 'org.reactivestreams:reactive-streams:1.0.0'
+	compile 'org.jgrapht:jgrapht-core:0.9.1'
+}
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-1.0.0'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+      tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+      }
+    }
+  }
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.3'
+}
