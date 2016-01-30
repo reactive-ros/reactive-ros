@@ -11,7 +11,7 @@
 
 ### Documentation ###
 
-* [javadoc](http://reactive-ros.github.io/)
+* [javadoc](http://reactive-ros.github.io/reactive-ros/)
 
 ### Contribution guidelines ###
 
