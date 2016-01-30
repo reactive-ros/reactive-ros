@@ -9,6 +9,10 @@
 * **make distribute** to distribute the library in separate .jar files
 * **make clean** to clean everything up
 
+### Documentation ###
+
+* [javadoc](http://reactive-ros.github.io/)
+
 ### Contribution guidelines ###
 
 * **make idea** to setup the Intellij workspace
