@@ -1,7 +1,5 @@
-fatJar: $(shell find src -type f)
-	@./gradlew fatJar
-distribute: $(shell find src -type f)
-	@./gradlew distZip
+intall: $(shell find src -type f)
+	@./gradlew install
 idea: 
 	@./gradlew idea
 doc:

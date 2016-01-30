@@ -1,12 +1,12 @@
-# Reactive Stream Library for rosjava #
+# Dataflow-oriented reactive stream library for the JVM #
 
 * Provides a rich set of declarative stream operators to compose complex dataflow graphs.
 
 ### How do I get set up? ###
 
 * Everything done with the Makefile in the root folder
-* **make fatJar** to bundle up everything in a single .jar file  
-* **make distribute** to distribute the library in separate .jar files
+* **make install** to deploy to local maven repo
+* **make doc** to generate javadoc
 * **make clean** to clean everything up
 
 ### Documentation ###
