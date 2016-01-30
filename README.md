@@ -8,6 +8,7 @@
 * **make fatJar** to bundle up everything in a single .jar file  
 * **make distribute** to distribute the library in separate .jar files
 * **make clean** to clean everything up
+
 ### Contribution guidelines ###
 
 * **make idea** to setup the Intellij workspace
