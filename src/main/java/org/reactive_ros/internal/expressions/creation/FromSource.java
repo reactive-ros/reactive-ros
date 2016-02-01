@@ -25,6 +25,6 @@ public class FromSource<T> extends NoInputExpr<T> implements Transformer<T> {
 
     @Override
     public String toString() {
-        return "FromSource: " + source.getClass().getTypeParameters()[0].getName();
+        return "FromSource: " + source;
     }
 }
