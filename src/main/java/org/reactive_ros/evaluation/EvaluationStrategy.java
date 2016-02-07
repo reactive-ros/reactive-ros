@@ -11,5 +11,4 @@ import org.reactive_ros.internal.output.Output;
  */
 public interface EvaluationStrategy {
     <T> void evaluate(Stream<T> stream, Output output);
-    EvaluationStrategy newStrategy();
 }

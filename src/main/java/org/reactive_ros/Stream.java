@@ -47,7 +47,7 @@ public class Stream<T> implements Serializable { // TODO create
     /**
      * The {@link EvaluationStrategy} to use.
      */
-    private static ThreadLocal<EvaluationStrategy> evaluationStrategy = ThreadLocal.withInitial(() -> null);
+    private static EvaluationStrategy evaluationStrategy;
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -72,7 +72,7 @@ public class Stream<T> implements Serializable { // TODO create
      * @param evaluationStrategy the {@link EvaluationStrategy} to use for evaluating this {@link Stream}
      */
     public static void setEvaluationStrategy(EvaluationStrategy evaluationStrategy) {
-        Stream.evaluationStrategy.set(evaluationStrategy);
+        Stream.evaluationStrategy= evaluationStrategy;
     }
 
     /**
@@ -656,9 +656,9 @@ public class Stream<T> implements Serializable { // TODO create
         // TODO Optimize
 
         // Evaluate
-        if (evaluationStrategy.get() == null)
+        if (evaluationStrategy == null)
             throw new RuntimeException("EvaluationStrategy not set.");
-        evaluationStrategy.get().evaluate(this, output);
+        evaluationStrategy.evaluate(this, output);
     }
 
     // Expose convenient method calls
@@ -704,10 +704,10 @@ public class Stream<T> implements Serializable { // TODO create
         return BlockingStream.from(this);
     }
 
-    public void printErr() {
-        this.subscribe((Action1<T>) System.err::println);
-    }
     public void print() {
-        this.subscribe((Action1<T>) System.out::println);
+        this.subscribe(System.out::println);
+    }
+    public void printAll() {
+        this.subscribe(System.out::println, System.out::println, () -> System.out.println("Complete"));
     }
 }
