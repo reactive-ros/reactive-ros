@@ -2,8 +2,10 @@ package org.reactive_ros;
 
 import org.reactive_ros.util.functions.*;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -47,18 +49,13 @@ public class BlockingStream<T> {
     }
 
     public List<T> toList() {
-        /*final AtomicReference<List<T>> ret = new AtomicReference<>();
-        ret.set(new ArrayList<>());
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        s.subscribe(t -> {
-            List<T> prev = ret.get();
-            prev.add(t);
-            ret.set(prev);
-        }, Actions.EMPTY, latch::countDown);
-        return ret.get();*/
-
         return s.toList().toBlocking().first();
+    }
+
+    public Queue<T> toQueue() {
+        Queue<T> queue = new LinkedList<>();
+        s.toBlocking().subscribe(queue::add);
+        return queue;
     }
 
     public List<T> toSortedList(Func2<? super T, ? super T, Integer> comparator) {
