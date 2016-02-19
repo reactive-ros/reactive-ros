@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,7 +54,7 @@ public class BlockingStream<T> {
     }
 
     public Queue<T> toQueue() {
-        Queue<T> queue = new LinkedList<>();
+        Queue<T> queue = new ConcurrentLinkedDeque<>();
         s.toBlocking().subscribe(queue::add);
         return queue;
     }
