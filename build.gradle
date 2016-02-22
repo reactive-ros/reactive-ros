@@ -4,6 +4,7 @@ apply plugin: 'idea'
 
 repositories {  
   mavenCentral()
+  maven { url "https://jitpack.io" }
 }
 
 sourceCompatibility = 1.8
@@ -15,8 +16,22 @@ version = 1.0
 dependencies {
   compile 'org.reactivestreams:reactive-streams:1.0.0'
   compile 'org.jgrapht:jgrapht-core:0.9.1'
+
   // Serialization
   compile 'com.cedarsoftware:json-io:4.1.9'
+
+  // Testing
+  testCompile 'junit:junit:4.11'
+  testCompile 'com.github.reactive-ros:rx-eval:-SNAPSHOT'
+}
+
+test {
+	testLogging {
+		displayGranularity 3
+		events 'passed', 'failed', 'standard_out'
+		//events 'passed', 'failed', 'standard_error'
+		//events 'passed', 'failed', 'standard_out', 'standard_error'
+	}
 }
 
 
