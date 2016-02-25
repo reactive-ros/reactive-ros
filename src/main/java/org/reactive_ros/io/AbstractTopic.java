@@ -10,6 +10,8 @@ public abstract class AbstractTopic<T, B> implements Source<T>, Sink<T> {
     protected String name;
     protected Serializer<B> serializer;
 
+    public abstract void setClient(Object client); // Type of client is unknown here
+
     protected AbstractTopic(String name, Serializer<B> serializer) {
         this.name = name;
         this.serializer = serializer;
