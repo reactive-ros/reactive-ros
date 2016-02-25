@@ -1,8 +1,8 @@
 package org.reactive_ros;
 
-import org.reactive_ros.internal.io.Listener;
-import org.reactive_ros.internal.io.Sink;
-import org.reactive_ros.internal.io.Source;
+import org.reactive_ros.io.Listener;
+import org.reactive_ros.io.Sink;
+import org.reactive_ros.io.Source;
 import org.reactive_ros.internal.graph.FlowGraph;
 import org.reactive_ros.internal.notifications.Notification;
 import org.reactive_ros.internal.output.*;

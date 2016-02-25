@@ -1,7 +1,7 @@
 package org.reactive_ros.internal.output;
 
 import org.reactive_ros.internal.expressions.Transformer;
-import org.reactive_ros.internal.io.Sink;
+import org.reactive_ros.io.Sink;
 
 /**
  * Redirects a {@link Transformer}'s resulting stream to a ROS topic.

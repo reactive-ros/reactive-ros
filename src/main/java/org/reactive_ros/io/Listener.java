@@ -1,4 +1,4 @@
-package org.reactive_ros.internal.io;
+package org.reactive_ros.io;
 
 import org.reactive_ros.Stream;
 import org.reactive_ros.util.functions.Action1;

@@ -1,4 +1,4 @@
-package org.reactive_ros;
+package org.reactive_ros.evaluation;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;

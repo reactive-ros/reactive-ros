@@ -1,4 +1,4 @@
-package org.reactive_ros.internal.io;
+package org.reactive_ros.io;
 
 import org.reactivestreams.Subscriber;
 
