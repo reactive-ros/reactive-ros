@@ -107,7 +107,7 @@ public class Stream<T> implements Serializable { // TODO create
      * @return the resulting {@link Stream}
      */
     public static <T> Stream<T> from(Source<T> source) {
-        return init(new FromSource<>(((Source<T>) source)));
+        return init(new FromSource<>(source));
     }
     /**
      * Constructs a {@link Stream} from a {@link Listener}.
