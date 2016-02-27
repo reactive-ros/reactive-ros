@@ -2,12 +2,14 @@ package org.reactive_ros.evaluation;
 
 import org.reactive_ros.internal.notifications.Notification;
 
+import java.io.Serializable;
+
 /**
  * All (de)serializers used by any {@link org.reactive_ros.evaluation.EvaluationStrategy} should implement this interface.
  * @param <B> the cross-machine representation of bytes
  * @author Orestis Melkonian
  */
-public interface Serializer<B> {
+public interface Serializer<B> extends Serializable {
 
     /**
      * Serializes given {@link Object}.
