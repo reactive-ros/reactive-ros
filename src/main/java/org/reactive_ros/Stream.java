@@ -194,7 +194,7 @@ public class Stream<T> implements Serializable { // TODO create
         return loop(streamFunc.call(Stream.<T>entry()));
     }
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc, long time, TimeUnit timeUnit) {
-        return loop(streamFunc.call(Stream.<T>entry().sample(1, TimeUnit.SECONDS)));
+        return loop(streamFunc.call(Stream.<T>entry().sample(time, timeUnit)));
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#map(rx.functions.Func1)">rx-java.map</a> */
     public <R> Stream<R> map(Func1<? super T, ? extends R> mapper) {
