@@ -1,5 +1,6 @@
 package org.reactive_ros;
 
+import org.reactive_ros.io.AbstractTopic;
 import org.reactive_ros.io.Listener;
 import org.reactive_ros.io.Sink;
 import org.reactive_ros.io.Source;
@@ -106,7 +107,7 @@ public class Stream<T> implements Serializable { // TODO create
      * @return the resulting {@link Stream}
      */
     public static <T> Stream<T> from(Source<T> source) {
-        return init(new FromSource<>(source));
+        return init(new FromSource<>(((Source<T>) source)));
     }
     /**
      * Constructs a {@link Stream} from a {@link Listener}.
