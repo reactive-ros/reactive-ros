@@ -4,8 +4,6 @@ import org.reactive_ros.internal.expressions.Transformer;
 import org.reactive_ros.util.functions.Action0;
 import org.reactive_ros.util.functions.Action1;
 
-import java.io.Serializable;
-
 /**
  * Applies an {@link org.reactive_ros.util.functions.Action} to a {@link Transformer}'s resulting stream.
  * @author Orestis Melknonian
