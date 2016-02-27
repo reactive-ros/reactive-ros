@@ -34,6 +34,12 @@ public abstract class AbstractTopic<T, B> implements Source<T>, Sink<T> {
         return name + "[" + Thread.currentThread().getId() + "]";
     }
 
+    /**
+     * Extracts all {@link AbstractTopic}s involved in the given dataflow graph.
+     * @param stream the {@link Stream} defined by the user
+     * @param output the {@link Output} to re-direct the evaluated result
+     * @return all {@link AbstractTopic}s as a {@link List}
+     */
     public static List<AbstractTopic> extract(Stream stream, Output output) {
         List<AbstractTopic> topics = stream.getGraph()
                 .vertexSet()
