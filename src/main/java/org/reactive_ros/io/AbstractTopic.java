@@ -3,7 +3,6 @@ package org.reactive_ros.io;
 import org.reactive_ros.Stream;
 import org.reactive_ros.evaluation.Serializer;
 import org.reactive_ros.internal.expressions.creation.FromSource;
-import org.reactive_ros.internal.graph.FlowGraph;
 import org.reactive_ros.internal.output.MultipleOutput;
 import org.reactive_ros.internal.output.Output;
 import org.reactive_ros.internal.output.SinkOutput;
@@ -14,12 +13,12 @@ import java.util.stream.Collectors;
 /**
  * @author Orestis Melkonian
  */
-public abstract class AbstractTopic<T, B> implements Source<T>, Sink<T> {
+public abstract class AbstractTopic<T, B, C> implements Source<T>, Sink<T> {
 
     protected String name;
     protected Serializer<B> serializer;
 
-    public abstract void setClient(Object client); // Type of client is unknown here
+    public abstract void setClient(C client);
 
     protected AbstractTopic(String name, Serializer<B> serializer) {
         this.name = name;
