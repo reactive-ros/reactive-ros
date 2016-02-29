@@ -2,7 +2,6 @@ package org.reactive_ros;
 
 import org.reactive_ros.util.functions.*;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -55,7 +54,7 @@ public class BlockingStream<T> {
 
     public Queue<T> toQueue() {
         Queue<T> queue = new ConcurrentLinkedDeque<>();
-        s.toBlocking().subscribe(queue::add);
+        subscribe(queue::add);
         return queue;
     }
 
