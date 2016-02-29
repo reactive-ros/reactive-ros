@@ -17,6 +17,7 @@ public abstract class AbstractTopic<T, B, C> implements Source<T>, Sink<T> {
 
     protected String name;
     protected Serializer<B> serializer;
+    protected C client;
 
     public abstract void setClient(C client);
 
