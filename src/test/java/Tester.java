@@ -1,5 +1,4 @@
 import org.junit.Test;
-import org.reactive_ros.internal.output.ActionOutput;
 import test_data.Collections;
 import test_data.utilities.Colors;
 import test_data.utilities.Threads;
