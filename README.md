@@ -11,7 +11,7 @@
 
 ### Documentation ###
 
-* [javadoc](http://reactive-ros.github.io/reactive-ros/javadoc/index.html)
+* [javadoc](http://rhea-flow.github.io/rhea-core/javadoc/index.html)
 
 ### Contribution guidelines ###
 
