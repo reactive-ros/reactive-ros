@@ -2,8 +2,8 @@ package org.rhea_core;
 
 import org.rhea_core.util.functions.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CountDownLatch;
@@ -23,14 +23,6 @@ public class BlockingStream<T> {
         return new BlockingStream<>(s);
     }
 
-    public T first() {
-        return elementAt(0);
-    }
-
-    public T last() {
-        return s.last().toBlocking().first();
-    }
-
     public T elementAt(int index) {
         final AtomicReference<T> ret = new AtomicReference<>();
         final CountDownLatch latch = new CountDownLatch(1);
@@ -44,12 +36,19 @@ public class BlockingStream<T> {
         return ret.get();
     }
 
-    public <R> R collect(Func0<R> stateFactory, Action2<R, ? super T> collector) {
-        return s.collect(stateFactory, collector).toBlocking().first();
+    public T first() {
+        return elementAt(0);
+    }
+
+    public T last() {
+        s = s.last();
+        return first();
     }
 
     public List<T> toList() {
-        return s.toList().toBlocking().first();
+        List<T> list = new ArrayList<>();
+        subscribe(list::add);
+        return list;
     }
 
     public Queue<T> toQueue() {
@@ -58,20 +57,10 @@ public class BlockingStream<T> {
         return queue;
     }
 
-    public List<T> toSortedList(Func2<? super T, ? super T, Integer> comparator) {
-        return s.toSortedList(comparator).toBlocking().first();
-    }
 
-    public <K> Map<K,T> toMap(Func1<? super T, ? extends K> keySelector) {
-        return s.toMap(keySelector).toBlocking().first();
-    }
-    public <K, V> Map<K,V> toMap(Func1<? super T, ? extends K> keySelector, Func1<? super T, ? extends V> valueSelector) {
-        return s.toMap(keySelector, valueSelector).toBlocking().first();
-    }
-    public <K, V> Map<K,V> toMap(Func1<? super T, ? extends K> keySelector, Func1<? super T, ? extends V> valueSelector, Func0<Map<K, V>> mapFactory) {
-        return s.toMap(keySelector, valueSelector, mapFactory).toBlocking().first();
-    }
-
+    /**
+     * Blocking subscribe
+     */
 
     public void subscribe() {
         final CountDownLatch latch = new CountDownLatch(1);
