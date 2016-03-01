@@ -24,15 +24,9 @@ public class BlockingStream<T> {
     }
 
     public T elementAt(int index) {
-        final AtomicReference<T> ret = new AtomicReference<>();
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        s.elementAt(index).subscribe(t -> {
-            ret.set(t);
-            latch.countDown();
-        });
-
-        await(latch);
+        s = s.elementAt(index);
+        AtomicReference<T> ret = new AtomicReference<>();
+        subscribe(ret::set);
         return ret.get();
     }
 
