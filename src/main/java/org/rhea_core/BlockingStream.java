@@ -57,7 +57,7 @@ public class BlockingStream<T> {
      */
 
     public void subscribe() {
-        final Semaphore semaphore = new Semaphore(1);
+        final Semaphore semaphore = new Semaphore(0);
 
         s.subscribe(Actions.EMPTY, Actions.EMPTY, semaphore::release);
 
@@ -65,7 +65,7 @@ public class BlockingStream<T> {
     }
 
     public void subscribe(Action1<? super T> action) {
-        final Semaphore semaphore = new Semaphore(1);
+        final Semaphore semaphore = new Semaphore(0);
 
         s.subscribe(action, Actions.EMPTY, semaphore::release);
 
@@ -73,7 +73,7 @@ public class BlockingStream<T> {
     }
 
     public void subscribe(Action1<T> action, Action1<Throwable> error) {
-        final Semaphore semaphore = new Semaphore(1);
+        final Semaphore semaphore = new Semaphore(0);
 
         s.subscribe(action, error, semaphore::release);
 
@@ -81,7 +81,7 @@ public class BlockingStream<T> {
     }
 
     public void subscribe(Action1<T> action, Action1<Throwable> error, Action0 complete) {
-        final Semaphore semaphore = new Semaphore(1);
+        final Semaphore semaphore = new Semaphore(0);
 
         s.subscribe(action, error, () -> {
             complete.call();
