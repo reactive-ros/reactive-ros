@@ -22,8 +22,8 @@ import org.rhea_core.io.Sink;
 import org.rhea_core.io.Source;
 import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.notifications.Notification;
-import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.evaluation.Serializer;
+import org.rhea_core.optimization.Optimizer;
 import org.rhea_core.util.functions.*;
 import org.jgrapht.Graphs;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
@@ -56,9 +56,9 @@ public class Stream<T> implements Serializable { // TODO create
     private Transformer toConnect;
 
     /**
-     * The {@link EvaluationStrategy} to use.
+     * The {@link Configuration} to use.
      */
-    private static EvaluationStrategy evaluationStrategy;
+    private static Configuration configuration;
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -80,10 +80,10 @@ public class Stream<T> implements Serializable { // TODO create
 
     /**
      * Must always be set prior to usage.
-     * @param evaluationStrategy the {@link EvaluationStrategy} to use for evaluating this {@link Stream}
+     * @param configuration the {@link Configuration} to use for evaluating this {@link Stream}
      */
-    public static void setEvaluationStrategy(EvaluationStrategy evaluationStrategy) {
-        Stream.evaluationStrategy= evaluationStrategy;
+    public static void configure(Configuration configuration) {
+        Stream.configuration = configuration;
     }
 
     /**
@@ -666,10 +666,12 @@ public class Stream<T> implements Serializable { // TODO create
     private void subscribe(Output output) {
         // TODO Optimize
 
+
         // Evaluate
-        if (evaluationStrategy == null)
-            throw new RuntimeException("EvaluationStrategy not set.");
-        evaluationStrategy.evaluate(this, output);
+        if (configuration == null)
+            throw new RuntimeException("Configuration not set.");
+
+        configuration.strategy.evaluate(Optimizer.optimize(this, configuration.remote.getDesiredGranularity()), output);
     }
 
     // Expose convenient method calls
@@ -716,9 +718,9 @@ public class Stream<T> implements Serializable { // TODO create
     }
 
     public void print() {
-        this.subscribe(System.out::println);
+        this.subscribe(i -> System.out.println(i));
     }
     public void printAll() {
-        this.subscribe(System.out::println, System.out::println, () -> System.out.println("Complete"));
+        this.subscribe(i -> System.out.println(i), e -> System.out.println(e), () -> System.out.println("Complete"));
     }
 }

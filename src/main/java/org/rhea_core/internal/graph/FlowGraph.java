@@ -113,6 +113,10 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
                 .collect(Collectors.toList());
     }
 
+    public int size() {
+        return (int) vertexSet().stream().count();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof FlowGraph))

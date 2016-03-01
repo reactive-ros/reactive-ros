@@ -24,6 +24,9 @@ dependencies {
   // Serialization
   compile 'com.cedarsoftware:json-io:4.1.9'
 
+  // Distribution
+  compile 'com.github.rhea-flow:remote-execution:-SNAPSHOT'
+
   // Testing
   testCompile 'junit:junit:4.11'
   testCompile 'com.github.rhea-flow:test-data:-SNAPSHOT'
