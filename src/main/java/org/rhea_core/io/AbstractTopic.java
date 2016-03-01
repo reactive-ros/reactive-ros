@@ -40,7 +40,7 @@ public abstract class AbstractTopic<T, B, C> implements Source<T>, Sink<T> {
      * @param output the {@link Output} to re-direct the evaluated result
      * @return all {@link AbstractTopic}s as a {@link List}
      */
-    public static List<AbstractTopic> extract(Stream stream, Output output) {
+    public static List<AbstractTopic> extractAll(Stream stream, Output output) {
         List<AbstractTopic> topics = stream.getGraph()
                 .vertexSet()
                 .stream()
