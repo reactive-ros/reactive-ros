@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -57,43 +57,43 @@ public class BlockingStream<T> {
      */
 
     public void subscribe() {
-        final CountDownLatch latch = new CountDownLatch(1);
+        final Semaphore semaphore = new Semaphore(1);
 
-        s.subscribe(Actions.EMPTY, Actions.EMPTY, latch::countDown);
+        s.subscribe(Actions.EMPTY, Actions.EMPTY, semaphore::release);
 
-        await(latch);
+        await(semaphore);
     }
 
     public void subscribe(Action1<? super T> action) {
-        final CountDownLatch latch = new CountDownLatch(1);
+        final Semaphore semaphore = new Semaphore(1);
 
-        s.subscribe(action, Actions.EMPTY, latch::countDown);
+        s.subscribe(action, Actions.EMPTY, semaphore::release);
 
-        await(latch);
+        await(semaphore);
     }
 
     public void subscribe(Action1<T> action, Action1<Throwable> error) {
-        final CountDownLatch latch = new CountDownLatch(1);
+        final Semaphore semaphore = new Semaphore(1);
 
-        s.subscribe(action, error, latch::countDown);
+        s.subscribe(action, error, semaphore::release);
 
-        await(latch);
+        await(semaphore);
     }
 
     public void subscribe(Action1<T> action, Action1<Throwable> error, Action0 complete) {
-        final CountDownLatch latch = new CountDownLatch(1);
+        final Semaphore semaphore = new Semaphore(1);
 
         s.subscribe(action, error, () -> {
             complete.call();
-            latch.countDown();
+            semaphore.release();
         });
 
-        await(latch);
+        await(semaphore);
     }
 
-    private void await(CountDownLatch latch) {
+    private void await(Semaphore semaphore) {
         try {
-            latch.await();
+            semaphore.acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
