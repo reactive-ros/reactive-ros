@@ -11,6 +11,7 @@ import org.rhea_core.internal.expressions.error_handling.RetryExpr;
 import org.rhea_core.internal.expressions.feedback.EntryPointExpr;
 import org.rhea_core.internal.expressions.feedback.ExitPointExpr;
 import org.rhea_core.internal.expressions.filtering.DistinctExpr;
+import org.rhea_core.internal.expressions.filtering.FilterExpr;
 import org.rhea_core.internal.expressions.transformational.MapExpr;
 import org.rhea_core.internal.expressions.transformational.ScanExpr;
 import org.rhea_core.internal.expressions.transformational.SimpleScanExpr;
@@ -151,7 +152,7 @@ public class Stream<T> implements Serializable { // TODO create
      * Entry point. Necessary whenever feedback loop operator is used.
      */
     public static <T> Stream<T> entry() {
-        return init(new EntryPointExpr<T>());
+        return init(new EntryPointExpr<>());
     }
 
     /* =======================================================
@@ -172,11 +173,8 @@ public class Stream<T> implements Serializable { // TODO create
         Transformer<T> entry = graph.getEntryPoint();
         Transformer<T> exit = new ExitPointExpr<>();
 
-        if (entry.getClass() != EntryPointExpr.class)
-            throw new RuntimeException("Cannot use loop with no EntryPointExpr as the first Transformer of the given Stream");
-
-        // Attach MergeMultiExpr
-        MergeMultiExpr<T> merge = new MergeMultiExpr<>();
+        // Attach ConcatMultiExpr
+        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
 
         // Add Merge and Exit
         this.graph.addVertex(merge);
@@ -198,7 +196,7 @@ public class Stream<T> implements Serializable { // TODO create
         this.graph.setConnectNode(exit);
 
 //        return this;
-        return new Stream<>(this.graph, this.graph.getConnectNode());
+        return new Stream<>(this.graph);
     }
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
         return loop(streamFunc.call(Stream.<T>entry()));
@@ -212,7 +210,7 @@ public class Stream<T> implements Serializable { // TODO create
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#filter(rx.functions.Func1)">rx-java.filter</a> */
     public Stream<T> filter(Func1<? super T, Boolean> predicate) {
-        return attach(new FilterExpr<T>(predicate));
+        return attach(new FilterExpr<>(predicate));
 //        return concatMap(t -> (filter.call(t)) ? just(t) : empty());
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#skipUntil(rx.Observable)">rx-java.skipUntil</a> */
@@ -351,7 +349,7 @@ public class Stream<T> implements Serializable { // TODO create
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#materialize()">rx-java.materialize</a> */
     public Stream<Notification<T>> materialize() {
-        return attach(new MaterializeExpr<T>());
+        return attach(new MaterializeExpr<>());
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#dematerialize()">rx-java.dematerialize</a> */
     public <T2> Stream<T2> dematerialize() {
@@ -399,11 +397,11 @@ public class Stream<T> implements Serializable { // TODO create
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#concat(rx.Observable)">rx-java.concat</a> */
     public static <T> Stream<T> concat(Stream<? extends Stream<? extends T>> streams) {
-        return streams.attach(new ConcatExpr<T>());
+        return streams.attach(new ConcatExpr<>());
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#concat(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable)">rx-java.concat</a> */
     public static <T> Stream<T> concat(List<? extends Stream<? extends T>> streams) {
-        return attachMulti(new ConcatMultiExpr<T>(), streams.toArray(new Stream[streams.size()]));
+        return attachMulti(new ConcatMultiExpr<>(), streams.toArray(new Stream[streams.size()]));
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.functions.Func2)">rx-java.zip</a> */
     public static <T1,T2,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Func2<? super T1, ? super T2, R> combiner) {
@@ -486,7 +484,7 @@ public class Stream<T> implements Serializable { // TODO create
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#merge(java.lang.Iterable)">rx-java.merge</a> */
     public static <T> Stream<T> merge(List<? extends Stream<? extends T>> streams) {
 //        return merge(from(streams));
-        return attachMulti(new MergeMultiExpr<T>(), streams.toArray(new Stream[streams.size()]));
+        return attachMulti(new MergeMultiExpr<>(), streams.toArray(new Stream[streams.size()]));
     }
     @SafeVarargs
     public static <T> Stream<T> merge(Stream<T>... streams) {

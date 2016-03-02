@@ -1,4 +1,4 @@
-package org.rhea_core.internal.expressions.conditional_boolean;
+package org.rhea_core.internal.expressions.filtering;
 
 import org.rhea_core.internal.expressions.SingleInputExpr;
 import org.rhea_core.internal.expressions.Transformer;
