@@ -1,7 +1,7 @@
 package org.rhea_core;
 
+import org.rhea_core.distribution.RemoteExecution;
 import org.rhea_core.evaluation.EvaluationStrategy;
-import remote_execution.RemoteExecution;
 
 /**
  * @author Orestis Melkonian

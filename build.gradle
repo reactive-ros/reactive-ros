@@ -25,7 +25,7 @@ dependencies {
   compile 'com.cedarsoftware:json-io:4.1.9'
 
   // Distribution
-  compile 'com.github.rhea-flow:remote-execution:-SNAPSHOT'
+  compile 'com.hazelcast:hazelcast:3.6'
 
   // Testing
   testCompile 'junit:junit:4.11'
