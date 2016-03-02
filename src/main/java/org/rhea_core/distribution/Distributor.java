@@ -13,14 +13,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-public class RemoteExecution {
+public class Distributor {
     HazelcastInstance hazelcast;
     List<Machine> machines;
 
     /**
      * Default constructor for single-machine usage.
      */
-    public RemoteExecution() {
+    public Distributor() {
         hazelcast = Hazelcast.newHazelcastInstance();
         machines = new ArrayList<>();
     }
@@ -29,7 +29,7 @@ public class RemoteExecution {
      * Constructor: should be executed on every machine with the same cluster information.
      * @param machines the machines to use for task distribution
      */
-    public RemoteExecution(List<Machine> machines) {
+    public Distributor(List<Machine> machines) {
         this.machines = machines;
         List<String> addresses = machines.stream().map(Machine::getIp).collect(Collectors.toList());
 

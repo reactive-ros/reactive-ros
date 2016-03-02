@@ -1,5 +1,7 @@
 package org.rhea_core;
 
+import org.rhea_core.distribution.Distributor;
+import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.*;
 import org.rhea_core.internal.expressions.combining.*;
@@ -85,6 +87,9 @@ public class Stream<T> implements Serializable { // TODO create
      */
     public static void configure(Configuration configuration) {
         Stream.configuration = configuration;
+    }
+    public static void configure(EvaluationStrategy evaluationStrategy, Distributor distributor) {
+        Stream.configuration = new Configuration(evaluationStrategy, distributor);
     }
 
     /**

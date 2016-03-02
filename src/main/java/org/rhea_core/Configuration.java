@@ -1,6 +1,6 @@
 package org.rhea_core;
 
-import org.rhea_core.distribution.RemoteExecution;
+import org.rhea_core.distribution.Distributor;
 import org.rhea_core.evaluation.EvaluationStrategy;
 
 /**
@@ -8,5 +8,10 @@ import org.rhea_core.evaluation.EvaluationStrategy;
  */
 public class Configuration {
     public EvaluationStrategy strategy;
-    public RemoteExecution remote;
+    public Distributor remote;
+
+    public Configuration(EvaluationStrategy strategy, Distributor remote) {
+        this.strategy = strategy;
+        this.remote = remote;
+    }
 }
