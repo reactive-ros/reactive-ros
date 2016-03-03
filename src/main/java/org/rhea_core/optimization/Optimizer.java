@@ -6,5 +6,5 @@ import org.rhea_core.internal.graph.FlowGraph;
  * @author Orestis Melkonian
  */
 public interface Optimizer {
-    public void optimize(FlowGraph graph);
+    void optimize(FlowGraph graph);
 }

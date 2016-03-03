@@ -14,14 +14,14 @@ public class EntryRemoval implements Optimizer {
 
     @Override
     public void optimize(FlowGraph graph) {
-        for (SimpleEdge edge : graph.edgeSet()) {
+        for (SimpleEdge edge : graph.edges()) {
+            if (!graph.containsEdge(edge)) continue;
             Transformer source = edge.getSource();
             Transformer target = edge.getTarget();
 
             // concat|merge -> entry
             if ((source instanceof ConcatMultiExpr || source instanceof MergeMultiExpr)
             &&  target instanceof EntryPointExpr) {
-                graph.removeEdge(source, target);
                 for (Transformer succ : graph.successors(target))
                     graph.addEdge(source, succ);
                 graph.removeVertex(target);

@@ -17,7 +17,8 @@ public class ProactiveFiltering implements Optimizer {
 
     @Override
     public void optimize(FlowGraph graph) {
-        for (SimpleEdge edge : graph.edgeSet()) {
+        for (SimpleEdge edge : graph.edges()) {
+            if (!graph.containsEdge(edge)) continue;
             Transformer source = edge.getSource();
             Transformer target = edge.getTarget();
 

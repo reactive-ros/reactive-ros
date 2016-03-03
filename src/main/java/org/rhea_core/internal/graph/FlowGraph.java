@@ -202,6 +202,18 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         return (int) vertexSet().stream().count();
     }
 
+    public List<SimpleEdge> edges() {
+        List<SimpleEdge> ret = new ArrayList<>();
+        edgeSet().forEach(ret::add);
+        return ret;
+    }
+
+    public List<Transformer> vertices() {
+        List<Transformer> ret = new ArrayList<>();
+        vertexSet().forEach(ret::add);
+        return ret;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof FlowGraph))

@@ -17,9 +17,7 @@ import org.rhea_core.internal.graph.SimpleEdge;
 import org.rhea_core.util.functions.Func1;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 /**
@@ -43,8 +41,8 @@ public class Merger implements Optimizer {
 
     public <T,R,R1,R2,T1,T2,T3,T4,T5,T6,T7,T8,T9,X1,X2,X3,X4,X5,X6,X7,X8,X9> 
     boolean merge(FlowGraph graph) {
-        for (Transformer vertex : graph.vertexSet()) {
-
+        for (Transformer vertex : graph.vertices()) {
+            if (!graph.containsVertex(vertex)) continue;
             // Meaningless nevers
             if (vertex instanceof NeverExpr) {
                 if (!graph.singular(vertex)) continue;
@@ -150,7 +148,8 @@ public class Merger implements Optimizer {
             graph.removeVertex(zip);
         }
 
-        for (SimpleEdge edge : graph.edgeSet()) {
+        for (SimpleEdge edge : graph.edges()) {
+            if (!graph.containsEdge(edge)) continue;
             Transformer source = edge.getSource();
             Transformer target = edge.getTarget();
 

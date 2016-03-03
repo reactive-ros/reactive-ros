@@ -21,7 +21,11 @@ public class Distributor {
      * Default constructor for single-machine usage.
      */
     public Distributor() {
-        hazelcast = Hazelcast.newHazelcastInstance();
+        Config config = new Config();
+        MemberAttributeConfig memberConfig = new MemberAttributeConfig();
+        memberConfig.setIntAttribute("CPU_CORES", Runtime.getRuntime().availableProcessors());
+        config.setMemberAttributeConfig(memberConfig);
+        hazelcast = Hazelcast.newHazelcastInstance(config);
         machines = new ArrayList<>();
     }
 
