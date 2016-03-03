@@ -26,7 +26,9 @@ import org.rhea_core.io.Source;
 import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.notifications.Notification;
 import org.rhea_core.evaluation.Serializer;
-import org.rhea_core.optimization.Optimizer;
+import org.rhea_core.optimization.EntryRemoval;
+import org.rhea_core.optimization.Merger;
+import org.rhea_core.optimization.ProactiveFiltering;
 import org.rhea_core.util.functions.*;
 import org.jgrapht.Graphs;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
@@ -667,14 +669,16 @@ public class Stream<T> implements Serializable { // TODO create
      *  Evaluation
      */
     private void subscribe(Output output) {
-        // TODO Optimize
-
-
-        // Evaluate
         if (configuration == null)
             throw new RuntimeException("Configuration not set.");
 
-        configuration.strategy.evaluate(Optimizer.optimize(this, configuration.remote.getDesiredGranularity()), output);
+        // Optimize
+        new EntryRemoval().optimize(graph);
+        new ProactiveFiltering().optimize(graph);
+        new Merger(configuration.remote.getDesiredGranularity()).optimize(graph);
+
+        // Evaluate
+        configuration.strategy.evaluate(new Stream(graph), output);
     }
 
     // Expose convenient method calls

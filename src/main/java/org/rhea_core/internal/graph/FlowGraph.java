@@ -2,11 +2,13 @@ package org.rhea_core.internal.graph;
 
 import org.rhea_core.Stream;
 import org.rhea_core.internal.expressions.NoInputExpr;
+import org.rhea_core.internal.expressions.SingleInputExpr;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.feedback.EntryPointExpr;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedPseudograph;
+import org.rhea_core.util.functions.Func0;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -105,12 +107,95 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         return ret;
     }
 
+    public Transformer predecessor(Transformer target) {
+        return predecessors(target).get(0);
+    }
+
+    public Transformer successor(Transformer target) {
+        return successors(target).get(0);
+    }
+
     public List<Transformer> predecessors(Transformer target) {
         return edgeSet().stream()
                 .filter(e -> e.getTarget().equals(target))
                 .sorted((e1, e2) -> e1.getOrder() < e2.getOrder() ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
                 .map(SimpleEdge::getSource)
                 .collect(Collectors.toList());
+    }
+
+    public List<Transformer> successors(Transformer source) {
+        return edgeSet().stream()
+                .filter(e -> e.getSource().equals(source))
+                .sorted((e1, e2) -> e1.getOrder() < e2.getOrder() ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
+                .map(SimpleEdge::getTarget)
+                .collect(Collectors.toList());
+    }
+
+    public boolean singular(Transformer source) {
+        return successors(source).size() == 1;
+    }
+
+    public void reorder(Transformer source, Transformer target) {
+        SimpleEdge e = getEdge(source, target);
+
+        if (e == null || successors(source).size() != 1) // cannot reorder when multiple connections exist
+            return;
+
+        removeEdge(e);
+        addEdge(target, source);
+
+        Transformer predecesssor = predecessor(source);
+        removeEdge(predecesssor, source);
+        addEdge(predecesssor, target);
+
+        for (Transformer successor : successors(target)) {
+            removeEdge(target, successor);
+            addEdge(source, successor);
+        }
+
+        if (toConnect.equals(target))
+            setConnectNode(source);
+    }
+
+    public void reorder(Transformer source, Transformer target, Func0<Transformer> sourceGen, Func0<Transformer> targetGen) {
+        SimpleEdge e = getEdge(source, target);
+
+        if (e == null || successors(source).size() != 1) // cannot reorder when multiple connections exist
+            return;
+
+        Transformer newSource = sourceGen.call();
+        Transformer newTarget = targetGen.call();
+        addVertex(newSource);
+        addVertex(newTarget);
+        addEdge(newTarget, newSource);
+
+        Transformer predecessor = predecessor(source);
+        addEdge(predecessor, newTarget);
+
+        for (Transformer successor : successors(target))
+            addEdge(newSource, successor);
+
+        if (toConnect.equals(target))
+            setConnectNode(newSource);
+
+        removeVertex(source);
+        removeVertex(target);
+    }
+
+    public void merge(Transformer source, Transformer target, Transformer merged) {
+        addVertex(merged);
+
+        for (Transformer pred : predecessors(source))
+            addEdge(pred, merged);
+
+        for (Transformer succ : successors(target))
+            addEdge(merged, succ);
+
+        if (toConnect.equals(target))
+            setConnectNode(merged);
+
+        removeVertex(source);
+        removeVertex(target);
     }
 
     public int size() {
