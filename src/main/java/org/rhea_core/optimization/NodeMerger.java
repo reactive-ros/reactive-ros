@@ -24,11 +24,11 @@ import java.util.stream.StreamSupport;
  * @author Orestis Melkonian
  */
 @SuppressWarnings("unchecked")
-public class Merger implements Optimizer {
+public class NodeMerger implements Optimizer {
 
     int granularity;
 
-    public Merger(int granularity) {
+    public NodeMerger(int granularity) {
         this.granularity = granularity;
     }
 
@@ -50,8 +50,10 @@ public class Merger implements Optimizer {
                 Transformer succ = graph.successor(vertex);
 
                 // never -> singleInput
-                if (succ instanceof SingleInputExpr)
+                if (succ instanceof SingleInputExpr) {
                     graph.merge(vertex, succ, new NeverExpr());
+                    return true;
+                }
                 // never -> zip
                 else if (succ instanceof ZipExpr) {
                     List<Transformer> pred = graph.predecessors(succ);
@@ -62,12 +64,16 @@ public class Merger implements Optimizer {
                         graph.addEdge(vertex, s);
                     graph.removeVertex(succ);
                     pred.stream().forEach(graph::removeVertex);
+                    return true;
                 }
                 // never -> merge
                 else if (succ instanceof MergeMultiExpr) {
                     List<Transformer> pred = graph.predecessors(succ);
                     if (pred.size() == 2) continue;
-                    else graph.removeVertex(vertex);
+                    else {
+                        graph.removeVertex(vertex);
+                        return true;
+                    }
                 }
                 // never -> concat
                 else if (succ instanceof ConcatMultiExpr) {
@@ -81,6 +87,7 @@ public class Merger implements Optimizer {
                             break;
                         }
                     }
+                    return true;
                 }
             }
 
@@ -146,6 +153,7 @@ public class Merger implements Optimizer {
                             F1.call(i1),F2.call(i2),F3.call(i3),F4.call(i4),F5.call(i5),F6.call(i6),F7.call(i7),F8.call(i8), F9.call(i9)); break;
             }
             graph.removeVertex(zip);
+            return true;
         }
 
         for (SimpleEdge edge : graph.edges()) {
@@ -222,6 +230,7 @@ public class Merger implements Optimizer {
             graph.merge(source, target, merged);
             return true;
         }
+
         return false;
     }
 }

@@ -2,6 +2,7 @@ package org.rhea_core.io;
 
 import org.rhea_core.Stream;
 import org.rhea_core.evaluation.Serializer;
+import org.rhea_core.internal.expressions.RestrictedExpr;
 import org.rhea_core.internal.expressions.creation.FromSource;
 import org.rhea_core.internal.output.MultipleOutput;
 import org.rhea_core.internal.output.Output;

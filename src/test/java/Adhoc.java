@@ -1,8 +1,12 @@
-import graph_viz.GraphVisualizer;
 import org.junit.Test;
-import org.rhea_core.Stream;
-import org.rhea_core.optimization.EntryRemoval;
+import org.reflections.Reflections;
+import org.rhea_core.distribution.Distributor;
+import org.rhea_core.evaluation.EvaluationStrategy;
 import test_data.utilities.Threads;
+
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Orestis Melkonian
@@ -10,13 +14,6 @@ import test_data.utilities.Threads;
 public class Adhoc {
     @Test
     public void test() throws InterruptedException {
-
-        Stream s = Stream.just(0).loop(i -> i.map(n -> n + 1));
-
-        new EntryRemoval().optimize(s.getGraph());
-
-        GraphVisualizer.display(s);
-
-        Threads.sleep();
+        new Distributor();
     }
 }

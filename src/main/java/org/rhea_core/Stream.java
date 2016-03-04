@@ -27,7 +27,7 @@ import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.notifications.Notification;
 import org.rhea_core.evaluation.Serializer;
 import org.rhea_core.optimization.EntryRemoval;
-import org.rhea_core.optimization.Merger;
+import org.rhea_core.optimization.NodeMerger;
 import org.rhea_core.optimization.ProactiveFiltering;
 import org.rhea_core.util.functions.*;
 import org.jgrapht.Graphs;
@@ -61,9 +61,9 @@ public class Stream<T> implements Serializable { // TODO create
     private Transformer toConnect;
 
     /**
-     * The {@link Configuration} to use.
+     * The {@link Distributor} to use.
      */
-    private static Configuration configuration;
+    private static Distributor distributor;
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -85,13 +85,10 @@ public class Stream<T> implements Serializable { // TODO create
 
     /**
      * Must always be set prior to usage.
-     * @param configuration the {@link Configuration} to use for evaluating this {@link Stream}
+     * @param distributor the {@link Distributor} to use for evaluating this {@link Stream}
      */
-    public static void configure(Configuration configuration) {
-        Stream.configuration = configuration;
-    }
-    public static void configure(EvaluationStrategy evaluationStrategy, Distributor distributor) {
-        Stream.configuration = new Configuration(evaluationStrategy, distributor);
+    public static void configure(Distributor distributor) {
+        Stream.distributor = distributor;
     }
 
     /**
@@ -669,16 +666,16 @@ public class Stream<T> implements Serializable { // TODO create
      *  Evaluation
      */
     private void subscribe(Output output) {
-        if (configuration == null)
-            throw new RuntimeException("Configuration not set.");
+        if (distributor == null)
+            throw new RuntimeException("Distributor not set");
 
         // Optimize
         new EntryRemoval().optimize(graph);
         new ProactiveFiltering().optimize(graph);
-        new Merger(configuration.remote.getDesiredGranularity()).optimize(graph);
+        new NodeMerger(distributor.getDesiredGranularity()).optimize(graph);
 
         // Evaluate
-        configuration.strategy.evaluate(new Stream(graph), output);
+        distributor.evaluate(new Stream(graph), output);
     }
 
     // Expose convenient method calls

@@ -5,39 +5,80 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.core.Member;
+import javafx.collections.transformation.SortedList;
+import org.reflections.Reflections;
+import org.rhea_core.Stream;
+import org.rhea_core.distribution.annotations.MachineInfo;
+import org.rhea_core.evaluation.EvaluationStrategy;
+import org.rhea_core.distribution.annotations.StrategyInfo;
+import org.rhea_core.internal.output.Output;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.lang.reflect.Modifier;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
 public class Distributor {
     HazelcastInstance hazelcast;
-    List<Machine> machines;
+    List<MachineInfo> machines = new ArrayList<>();
+    List<StrategyInfo> strategies = new ArrayList<>();
+    StrategyInfo distributedStrategy;
+    int desiredGranularity;
 
-    /**
-     * Default constructor for single-machine usage.
-     */
     public Distributor() {
-        Config config = new Config();
-        MemberAttributeConfig memberConfig = new MemberAttributeConfig();
-        memberConfig.setIntAttribute("CPU_CORES", Runtime.getRuntime().availableProcessors());
-        config.setMemberAttributeConfig(memberConfig);
-        hazelcast = Hazelcast.newHazelcastInstance(config);
-        machines = new ArrayList<>();
-    }
+        Reflections ref = new Reflections();
 
-    /**
-     * Constructor: should be executed on every machine with the same cluster information.
-     * @param machines the machines to use for task distribution
-     */
-    public Distributor(List<Machine> machines) {
-        this.machines = machines;
-        List<String> addresses = machines.stream().map(Machine::getIp).collect(Collectors.toList());
+        // Find machines at classpath
+        System.out.println("----------------------- MACHINES -----------------------");
+        List<Class<? extends Machine>> machineClasses =
+                ref.getSubTypesOf(Machine.class).stream()
+                        .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
+                        .collect(Collectors.toList());
+        for (Class clazz : machineClasses) {
+            MachineInfo machine = (MachineInfo) clazz.getAnnotation(MachineInfo.class);
+            System.out.println("hostname: " + machine.hostname());
+            System.out.println("ip: " + machine.ip());
+            System.out.println("skills: " + Arrays.toString(machine.skills()));
+            System.out.println();
+
+            machines.add(machine);
+        }
+        desiredGranularity = machines.stream().map(MachineInfo::cores).reduce((i1, i2) -> i1 + i2).get();
+
+        System.out.println("----------------------- STRATEGIES -----------------------");
+        // Find strategies at classpath
+        List<Class<? extends EvaluationStrategy>> strategyClasses =
+                ref.getSubTypesOf(EvaluationStrategy.class)
+                        .stream()
+                        .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
+                        .collect(Collectors.toList());
+
+        List<StrategyInfo> distStrategies = new ArrayList<>();
+        for (Class clazz : strategyClasses) {
+            StrategyInfo strategy = (StrategyInfo) clazz.getAnnotation(StrategyInfo.class);
+            System.out.println("id: " + strategy.id());
+            System.out.println("distributed: " + strategy.distributed());
+            System.out.println("requiredSkills: " + Arrays.toString(strategy.requiredSkills()));
+            System.out.println("priority: " + strategy.priority());
+            System.out.println();
+
+            strategies.add(strategy);
+            if (strategy.distributed())
+                distStrategies.add(strategy);
+        }
+
+        // Check that at least 1 distributed evaluation strategy is present
+        if (distStrategies.isEmpty())
+            throw new RuntimeException("No distributed evaluation strategy in classpath");
+
+        // Set distributed strategy with highest priority
+        Collections.sort(distStrategies, (s1, s2) -> s1.priority() > s2.priority() ? 1 : (s1.priority() == s2.priority()) ? 0 : -1);
+        distributedStrategy = distStrategies.get(0);
+
+        hazelcast = Hazelcast.newHazelcastInstance();
 
         // Setup network configuration
+        /*List<String> addresses = machines.stream().map(MachineInfo::hostname).collect(Collectors.toList());
         Config cfg = new Config();
         NetworkConfig network = cfg.getNetworkConfig();
         network.setReuseAddress(true);
@@ -50,8 +91,24 @@ public class Distributor {
         InterfacesConfig interfaces = network.getInterfaces().setEnabled(true);
         for (String address : addresses)
             interfaces = interfaces.addInterface(address);
+        hazelcast = Hazelcast.newHazelcastInstance(cfg);*/
+    }
 
-        hazelcast = Hazelcast.newHazelcastInstance(cfg);
+    public int getDesiredGranularity() {
+        return desiredGranularity;
+    }
+
+    public void evaluate(Stream stream, Output output) {
+
+
+
+
+
+        // TODO decrease granularity
+        if (stream.getGraph().size() > desiredGranularity) {
+        }
+
+        // Execute
     }
 
     public void executeOn(Runnable task, String ip) {
@@ -73,25 +130,16 @@ public class Distributor {
         // Print each machine of the cluster
         members.stream().forEach(System.out::println);
 
-        // TODO Placement constrains
+        // TODO Placement constraints
         // Execute task only on machines having the required attributes.
 
         // TODO Placement optimization
-        // Profile network cost and operator cost to determine optimal placement.
+        // Profile network cost (and operator cost) to determine optimal placement.
 
         // Execute tasks
         StreamTask task;
         while ((task = tasks.poll()) != null)
             executorService.execute(task);
-    }
-
-    public int getDesiredGranularity() {
-        int totalCores = 0;
-        for (Member member : hazelcast.getCluster().getMembers()) {
-            int cores = member.getIntAttribute("CPU_CORES");
-            totalCores += cores;
-        }
-        return totalCores;
     }
 }
 
