@@ -8,7 +8,7 @@ import org.rhea_core.internal.output.Output;
 /**
  * @author Orestis Melkonian
  */
-@StrategyInfo(id = "Ros", distributed = true, requiredSkills = {"Ros"}, priority = 1)
+@StrategyInfo(requiredSkills = {"Ros"}, priority = 1)
 public class RosStrategy implements EvaluationStrategy {
     @Override
     public <T> void evaluate(Stream<T> stream, Output output) {

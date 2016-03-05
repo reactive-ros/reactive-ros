@@ -11,8 +11,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrategyInfo {
-    String id() default "";
-    boolean distributed() default false;
     String[] requiredSkills() default "";
     int priority() default 0;
 }

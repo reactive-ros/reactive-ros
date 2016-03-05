@@ -1,5 +1,5 @@
 import org.junit.Test;
-import org.rhea_core.distribution.HazelcastMain;
+import org.rhea_core.distribution.hazelcast.HazelcastMain;
 import test_data.Collections;
 import test_data.utilities.Colors;
 import test_data.utilities.Threads;

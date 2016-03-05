@@ -1,97 +1,54 @@
 package org.rhea_core.distribution;
 
-import com.hazelcast.config.*;
-import com.hazelcast.core.Hazelcast;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IExecutorService;
-import com.hazelcast.core.Member;
-import javafx.collections.transformation.SortedList;
-import org.reflections.Reflections;
+import com.hazelcast.core.*;
+import org.jgrapht.traverse.BreadthFirstIterator;
 import org.rhea_core.Stream;
 import org.rhea_core.distribution.annotations.MachineInfo;
-import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.distribution.annotations.StrategyInfo;
+import org.rhea_core.distribution.graph.DistributedGraph;
+import org.rhea_core.distribution.graph.TopicEdge;
+import org.rhea_core.distribution.hazelcast.HazelcastTopic;
+import org.rhea_core.distribution.tasks.StreamTask;
+import org.rhea_core.evaluation.EvaluationStrategy;
+import org.rhea_core.internal.expressions.MultipleInputExpr;
+import org.rhea_core.internal.expressions.NoInputExpr;
+import org.rhea_core.internal.expressions.SingleInputExpr;
+import org.rhea_core.internal.expressions.Transformer;
+import org.rhea_core.internal.expressions.creation.FromSource;
+import org.rhea_core.internal.graph.FlowGraph;
+import org.rhea_core.internal.output.MultipleOutput;
 import org.rhea_core.internal.output.Output;
+import org.rhea_core.internal.output.SinkOutput;
+import org.rhea_core.util.ReflectionUtils;
+import org.rhea_core.util.functions.Func0;
 
-import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
 public class Distributor {
     HazelcastInstance hazelcast;
-    List<MachineInfo> machines = new ArrayList<>();
-    List<StrategyInfo> strategies = new ArrayList<>();
-    StrategyInfo distributedStrategy;
+    List<MachineInfo> machines;
+    List<StrategyInfo> strategies;
     int desiredGranularity;
 
-    public Distributor() {
-        Reflections ref = new Reflections();
+    Func0<EvaluationStrategy> strategy;
 
-        // Find machines at classpath
-        System.out.println("----------------------- MACHINES -----------------------");
-        List<Class<? extends Machine>> machineClasses =
-                ref.getSubTypesOf(Machine.class).stream()
-                        .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
-                        .collect(Collectors.toList());
-        for (Class clazz : machineClasses) {
-            MachineInfo machine = (MachineInfo) clazz.getAnnotation(MachineInfo.class);
-            System.out.println("hostname: " + machine.hostname());
-            System.out.println("ip: " + machine.ip());
-            System.out.println("skills: " + Arrays.toString(machine.skills()));
-            System.out.println();
-
-            machines.add(machine);
-        }
+    public Distributor(HazelcastInstance hazelcast) {
+        machines = ReflectionUtils.getMachines();
+        strategies = ReflectionUtils.getStrategies();
         desiredGranularity = machines.stream().map(MachineInfo::cores).reduce((i1, i2) -> i1 + i2).get();
+        this.hazelcast = hazelcast;
+    }
 
-        System.out.println("----------------------- STRATEGIES -----------------------");
-        // Find strategies at classpath
-        List<Class<? extends EvaluationStrategy>> strategyClasses =
-                ref.getSubTypesOf(EvaluationStrategy.class)
-                        .stream()
-                        .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
-                        .collect(Collectors.toList());
+    public Distributor() {
+        this(Hazelcast.newHazelcastInstance());
+    }
 
-        List<StrategyInfo> distStrategies = new ArrayList<>();
-        for (Class clazz : strategyClasses) {
-            StrategyInfo strategy = (StrategyInfo) clazz.getAnnotation(StrategyInfo.class);
-            System.out.println("id: " + strategy.id());
-            System.out.println("distributed: " + strategy.distributed());
-            System.out.println("requiredSkills: " + Arrays.toString(strategy.requiredSkills()));
-            System.out.println("priority: " + strategy.priority());
-            System.out.println();
-
-            strategies.add(strategy);
-            if (strategy.distributed())
-                distStrategies.add(strategy);
-        }
-
-        // Check that at least 1 distributed evaluation strategy is present
-        if (distStrategies.isEmpty())
-            throw new RuntimeException("No distributed evaluation strategy in classpath");
-
-        // Set distributed strategy with highest priority
-        Collections.sort(distStrategies, (s1, s2) -> s1.priority() > s2.priority() ? 1 : (s1.priority() == s2.priority()) ? 0 : -1);
-        distributedStrategy = distStrategies.get(0);
-
-        hazelcast = Hazelcast.newHazelcastInstance();
-
-        // Setup network configuration
-        /*List<String> addresses = machines.stream().map(MachineInfo::hostname).collect(Collectors.toList());
-        Config cfg = new Config();
-        NetworkConfig network = cfg.getNetworkConfig();
-        network.setReuseAddress(true);
-
-        JoinConfig join = network.getJoin();
-        join.getMulticastConfig().setEnabled(false);
-        TcpIpConfig ipConfig = join.getTcpIpConfig().setEnabled(true);
-        for (String address : addresses)
-            ipConfig = ipConfig.addMember(address);
-        InterfacesConfig interfaces = network.getInterfaces().setEnabled(true);
-        for (String address : addresses)
-            interfaces = interfaces.addInterface(address);
-        hazelcast = Hazelcast.newHazelcastInstance(cfg);*/
+    public Distributor(Func0<EvaluationStrategy> strategy) {
+        this(Hazelcast.newHazelcastInstance());
+        this.strategy = strategy;
     }
 
     public int getDesiredGranularity() {
@@ -100,18 +57,70 @@ public class Distributor {
 
     public void evaluate(Stream stream, Output output) {
 
+        // TODO decrease granularity { iff (stream.getGraph().size() > desiredGranularity) }
 
+        DistributedGraph graph = new DistributedGraph(stream.getGraph(), this::newTopic);
 
+        Queue<StreamTask> tasks = new LinkedList<>();
 
+        // Run output node first
+        HazelcastTopic result = newTopic();
+        tasks.add(new StreamTask(strategy, Stream.from(result), output, new ArrayList<>()));
 
-        // TODO decrease granularity
-        if (stream.getGraph().size() > desiredGranularity) {
+        // Then run each graph vertex as an individual node (reverse BFS)
+        Set<Transformer> checked = new HashSet<>();
+        Stack<Transformer> stack = new Stack<>();
+        for (Transformer root : graph.getRoots())
+            new BreadthFirstIterator<>(graph, root).forEachRemaining(stack::push);
+        while (!stack.empty()) {
+            Transformer toExecute = stack.pop();
+            if (checked.contains(toExecute)) continue;
+
+            Set<TopicEdge> inputs = graph.incomingEdgesOf(toExecute);
+
+            FlowGraph innerGraph = new FlowGraph();
+            if (toExecute instanceof NoInputExpr) {
+                assert inputs.size() == 0;
+                // 0 input
+                innerGraph.addConnectVertex(toExecute);
+            } else if (toExecute instanceof SingleInputExpr) {
+                assert inputs.size() == 1;
+                // 1 input
+                HazelcastTopic input = inputs.iterator().next().getTopic();
+                Transformer toAdd = new FromSource(input.clone());
+                innerGraph.addConnectVertex(toAdd);
+                innerGraph.attach(toExecute);
+            } else if (toExecute instanceof MultipleInputExpr) {
+                assert inputs.size() > 1;
+                // N inputs
+                innerGraph.setConnectNodes(inputs.stream()
+                        .map(edge -> new FromSource(edge.getTopic().clone()))
+                        .collect(Collectors.toList()));
+                innerGraph.attachMulti(toExecute);
+            }
+
+            // Set outputs according to graph connections
+            Set<TopicEdge> outputs = graph.outgoingEdgesOf(toExecute);
+            List<Output> list = new ArrayList<>();
+            if (toExecute.equals(graph.toConnect))
+                list.add(new SinkOutput(result.clone()));
+            list.addAll(outputs.stream()
+                    .map(TopicEdge::getTopic)
+                    .map((Function<HazelcastTopic, SinkOutput<Object>>) sink -> new SinkOutput(sink))
+                    .collect(Collectors.toList()));
+            Output outputToExecute = (list.size() == 1) ? list.get(0) : new MultipleOutput(list);
+
+            // Schedule for execution
+            tasks.add(new StreamTask(strategy, new Stream(innerGraph), outputToExecute, new ArrayList<>()));
+
+            checked.add(toExecute);
         }
 
         // Execute
+        submit(tasks);
     }
 
-    public void executeOn(Runnable task, String ip) {
+    private void executeOn(Runnable task, String ip) {
         for (Member member : hazelcast.getCluster().getMembers()) {
             String host = member.getAddress().getHost(); // TODO find proper IP
             if (host.equals(ip))
@@ -123,7 +132,7 @@ public class Distributor {
      * Executes the given {@link StreamTask}s on the current cluster.
      * @param tasks the {@link StreamTask}s to execute
      */
-    public void submit(Queue<? extends StreamTask> tasks) {
+    private void submit(Queue<? extends StreamTask> tasks) {
         IExecutorService executorService = hazelcast.getExecutorService("ex");
         Set<Member> members = hazelcast.getCluster().getMembers();
 
@@ -140,6 +149,15 @@ public class Distributor {
         StreamTask task;
         while ((task = tasks.poll()) != null)
             executorService.execute(task);
+    }
+
+    /**
+     * Generators
+     */
+    String nodePrefix = "t";
+    int topicCounter = 0;
+    public HazelcastTopic newTopic() {
+        return new HazelcastTopic(nodePrefix + "/" + Integer.toString(topicCounter++));
     }
 }
 
