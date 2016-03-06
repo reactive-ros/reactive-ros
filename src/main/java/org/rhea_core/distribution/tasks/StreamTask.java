@@ -9,7 +9,6 @@ import org.rhea_core.internal.output.Output;
 import org.rhea_core.util.functions.Func0;
 
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +57,7 @@ public class StreamTask implements Runnable, Serializable, HazelcastInstanceAwar
 
     @Override
     public void run() {
-        System.out.println("--------------------------" + instanceIP(hazelcast) + "--------------------------");
-
+         if (Stream.DEBUG) System.out.println(this);
         // Setup network configuration TODO move to init() main method
         /*List<String> addresses = machines.stream().map(MachineInfo::hostname).collect(Collectors.toList());
         Config cfg = new Config();
@@ -85,7 +83,8 @@ public class StreamTask implements Runnable, Serializable, HazelcastInstanceAwar
     @Override
     public String toString() {
         return "\n\n======================== "
-                + ManagementFactory.getRuntimeMXBean().getName() + "@" + Thread.currentThread().getId()
+                + instanceIP()
+//                + ManagementFactory.getRuntimeMXBean().getName() + "@" + Thread.currentThread().getId()
                 + " ========================"
                 + "\n" + stream.getGraph()
                 + "\n\t===>\t" + output + "\n"
@@ -97,8 +96,8 @@ public class StreamTask implements Runnable, Serializable, HazelcastInstanceAwar
         this.hazelcast = hazelcastInstance;
     }
 
-    private String instanceIP(HazelcastInstance instance) {
-        String str = instance.toString();
+    private String instanceIP() {
+        String str = hazelcast.toString();
         return (str.substring(str.indexOf("Address") + 7, str.length() - 1)).replace("[","").replace("]","");
     }
 }

@@ -46,6 +46,8 @@ import java.util.stream.IntStream;
  */
 public class Stream<T> implements Serializable { // TODO create
 
+    public static boolean DEBUG = false;
+
     /**
      * The internal representation of this {@link Stream} as a {@link FlowGraph}.
      */

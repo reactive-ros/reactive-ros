@@ -37,14 +37,16 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
             Notification<T> notification = serializer.deserialize(msg);
             switch (notification.getKind()) {
                 case OnNext:
-                    System.out.println(name() + ": Recv\t" + notification.getValue());
+                    if (Stream.DEBUG)
+                        System.out.println(name() + ": Recv\t" + notification.getValue());
                     s.onNext(notification.getValue());
                     break;
                 case OnError:
                     s.onError(notification.getThrowable());
                     break;
                 case OnCompleted:
-                    System.out.println(name() + ": Recv\tComplete");
+                    if (Stream.DEBUG)
+                        System.out.println(name() + ": Recv\tComplete");
                     s.onComplete();
                     break;
                 default:
@@ -59,6 +61,7 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
 
     @Override
     public void onNext(T t) {
+        if (Stream.DEBUG) System.out.println(name() + ": Send\t" + t);
         publish(Notification.createOnNext(t));
     }
 
@@ -69,6 +72,7 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
 
     @Override
     public void onComplete() {
+        if (Stream.DEBUG) System.out.println(name() + ": Send\tComplete");
         publish(Notification.createOnCompleted());
     }
 
