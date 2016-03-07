@@ -54,8 +54,8 @@ public class SimpleEdge extends DefaultEdge {
 
     @Override
     public String toString() {
-        return "";
-/*        return "#" + order;
-        return source + " <=> " + target;*/
+//        return "";
+        return "#" + order;
+//        return source + " <=> " + target;
     }
 }

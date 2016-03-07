@@ -182,8 +182,6 @@ public class Stream<T> implements Serializable { // TODO create
         this.graph.addVertex(merge);
         this.graph.addVertex(exit);
 
-        // Create feedback edge
-        this.graph.addEdge(exit, merge);
         this.graph.attach(merge);
 
         // Connect to stream's graph
@@ -194,11 +192,11 @@ public class Stream<T> implements Serializable { // TODO create
 
         // Attach ExitPoint
         this.graph.attach(exit);
-
         this.graph.setConnectNode(exit);
 
-//        return this;
-        return new Stream<>(this.graph);
+        this.graph.addEdge(exit, merge);
+
+        return this;
     }
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
         return loop(streamFunc.call(Stream.<T>entry()));
