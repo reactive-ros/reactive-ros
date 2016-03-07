@@ -2,6 +2,8 @@ package org.rhea_core.distribution.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ITopic;
+import com.hazelcast.core.Message;
+import com.hazelcast.topic.ReliableMessageListener;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.rhea_core.Stream;
@@ -32,24 +34,49 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
 
     @Override
     public void subscribe(Subscriber<? super T> s) {
-        topic.addMessageListener(message -> {
-            byte[] msg = message.getMessageObject();
-            Notification<T> notification = serializer.deserialize(msg);
-            switch (notification.getKind()) {
-                case OnNext:
-                    if (Stream.DEBUG)
-                        System.out.println(name() + ": Recv\t" + notification.getValue());
-                    s.onNext(notification.getValue());
-                    break;
-                case OnError:
-                    s.onError(notification.getThrowable());
-                    break;
-                case OnCompleted:
-                    if (Stream.DEBUG)
-                        System.out.println(name() + ": Recv\tComplete");
-                    s.onComplete();
-                    break;
-                default:
+        topic.addMessageListener(new ReliableMessageListener<byte[]>() {
+            long sequence = 0;
+
+            @Override
+            public long retrieveInitialSequence() {
+                return sequence + 1;
+            }
+
+            @Override
+            public void storeSequence(long sequence) {
+                this.sequence = sequence;
+            }
+
+            @Override
+            public boolean isLossTolerant() {
+                return false;
+            }
+
+            @Override
+            public boolean isTerminal(Throwable failure) {
+                return false;
+            }
+
+            @Override
+            public void onMessage(Message<byte[]> message) {
+                byte[] msg = message.getMessageObject();
+                Notification<T> notification = serializer.deserialize(msg);
+                switch (notification.getKind()) {
+                    case OnNext:
+                        if (Stream.DEBUG)
+                            System.out.println(name() + ": Recv\t" + notification.getValue());
+                        s.onNext(notification.getValue());
+                        break;
+                    case OnError:
+                        s.onError(notification.getThrowable());
+                        break;
+                    case OnCompleted:
+                        if (Stream.DEBUG)
+                            System.out.println(name() + ": Recv\tComplete");
+                        s.onComplete();
+                        break;
+                    default:
+                }
             }
         });
     }
