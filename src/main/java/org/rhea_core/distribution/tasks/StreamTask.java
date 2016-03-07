@@ -57,22 +57,7 @@ public class StreamTask implements Runnable, Serializable, HazelcastInstanceAwar
 
     @Override
     public void run() {
-         if (Stream.DEBUG) System.out.println(this);
-        // Setup network configuration TODO move to init() main method
-        /*List<String> addresses = machines.stream().map(MachineInfo::hostname).collect(Collectors.toList());
-        Config cfg = new Config();
-        NetworkConfig network = cfg.getNetworkConfig();
-        network.setReuseAddress(true);
-
-        JoinConfig join = network.getJoin();
-        join.getMulticastConfig().setEnabled(false);
-        TcpIpConfig ipConfig = join.getTcpIpConfig().setEnabled(true);
-        for (String address : addresses)
-            ipConfig = ipConfig.addMember(address);
-        InterfacesConfig interfaces = network.getInterfaces().setEnabled(true);
-        for (String address : addresses)
-            interfaces = interfaces.addInterface(address);
-        hazelcast = Hazelcast.newHazelcastInstance(cfg);*/
+        if (Stream.DEBUG) System.out.println(this);
 
         for (HazelcastTopic topic : HazelcastTopic.extract(stream, output))
             topic.setClient(hazelcast);

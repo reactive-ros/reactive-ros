@@ -27,7 +27,7 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
     @Override
     public void setClient(HazelcastInstance client) {
         this.client = client;
-        topic = client.getTopic(name);
+        topic = client.getReliableTopic(name);
     }
 
     @Override
