@@ -39,7 +39,7 @@ public class HazelcastTopic<T> extends AbstractTopic<T, byte[], HazelcastInstanc
 
             @Override
             public long retrieveInitialSequence() {
-                return sequence + 1;
+                return (sequence == 0) ? 0 : sequence + 1;
             }
 
             @Override
