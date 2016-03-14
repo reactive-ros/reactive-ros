@@ -170,39 +170,18 @@ public class Stream<T> implements Serializable { // TODO create
     /**
      * Feedback Loop
      */
-    public Stream<T> loop(Stream<T> stream) {
-        FlowGraph graph = stream.getGraph();
-        Transformer<T> entry = graph.getEntryPoint();
-        Transformer<T> exit = new ExitPointExpr<>();
-
-        // Attach Concat
-        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
-
-        // Add Merge and Exit
-        this.graph.addVertex(merge);
-        this.graph.addVertex(exit);
-
-        this.graph.attach(merge);
-
-        // Connect to stream's graph
-        Graphs.addAllVertices(this.getGraph(), graph.vertexSet());
-        Graphs.addAllEdges(this.getGraph(), graph, graph.edgeSet());
-        this.graph.setConnectNode(graph.getConnectNode());
-        this.graph.addEdge(merge, entry);
-
-        // Attach ExitPoint
-        this.graph.attach(exit);
-        this.graph.setConnectNode(exit);
-
-        this.graph.addEdge(exit, merge);
-
-        return new Stream<>(graph);
-    }
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
-        return loop(streamFunc.call(Stream.<T>entry()));
-    }
-    public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc, long time, TimeUnit timeUnit) {
-        return loop(streamFunc.call(Stream.<T>entry().sample(time, timeUnit)));
+        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
+        graph.addVertex(merge);
+        graph.attach(merge);
+        toConnect = graph.getConnectNode();
+
+        FlowGraph newGraph = streamFunc.call(this).getGraph();
+
+        newGraph.addEdge(newGraph.getConnectNode(), merge);
+        newGraph.setConnectNode(merge);
+
+        return new Stream<>(newGraph);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#map(rx.functions.Func1)">rx-java.map</a> */
     public <R> Stream<R> map(Func1<? super T, ? extends R> mapper) {
