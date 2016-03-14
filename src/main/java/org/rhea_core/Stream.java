@@ -175,7 +175,7 @@ public class Stream<T> implements Serializable { // TODO create
         Transformer<T> entry = graph.getEntryPoint();
         Transformer<T> exit = new ExitPointExpr<>();
 
-        // Attach ConcatMultiExpr
+        // Attach Concat
         ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
 
         // Add Merge and Exit
@@ -196,7 +196,7 @@ public class Stream<T> implements Serializable { // TODO create
 
         this.graph.addEdge(exit, merge);
 
-        return this;
+        return new Stream<>(graph);
     }
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
         return loop(streamFunc.call(Stream.<T>entry()));
