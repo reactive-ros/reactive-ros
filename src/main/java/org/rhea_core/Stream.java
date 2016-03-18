@@ -25,6 +25,8 @@ import org.rhea_core.io.Source;
 import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.notifications.Notification;
 import org.rhea_core.evaluation.Serializer;
+import org.rhea_core.optimization.NodeMerger;
+import org.rhea_core.optimization.ProactiveFiltering;
 import org.rhea_core.util.functions.*;
 import org.jgrapht.Graphs;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
@@ -642,12 +644,11 @@ public class Stream<T> implements Serializable { // TODO create
      */
     private void subscribe(Output output) {
         if (distributor == null)
-            distributor = new Distributor(); // throw new RuntimeException("Distributor not set");
+            distributor = new Distributor();
 
         // Optimize
-        /*new EntryRemoval().optimize(graph);
         new ProactiveFiltering().optimize(graph);
-        new NodeMerger(distributor.getDesiredGranularity()).optimize(graph);*/
+        new NodeMerger(distributor.getDesiredGranularity()).optimize(graph);
 
         // Evaluate
         distributor.evaluate(new Stream(graph), output);
