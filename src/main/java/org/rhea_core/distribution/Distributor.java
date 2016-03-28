@@ -8,7 +8,6 @@ import org.rhea_core.distribution.annotations.StrategyInfo;
 import org.rhea_core.distribution.graph.DistributedGraph;
 import org.rhea_core.distribution.graph.TopicEdge;
 import org.rhea_core.distribution.hazelcast.HazelcastTopic;
-import org.rhea_core.distribution.tasks.StreamTask;
 import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.expressions.MultipleInputExpr;
 import org.rhea_core.internal.expressions.NoInputExpr;

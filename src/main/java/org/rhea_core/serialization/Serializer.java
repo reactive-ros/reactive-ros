@@ -1,5 +1,6 @@
-package org.rhea_core.evaluation;
+package org.rhea_core.serialization;
 
+import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.notifications.Notification;
 
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-package org.rhea_core.evaluation;
+package org.rhea_core.serialization;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;

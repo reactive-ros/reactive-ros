@@ -1,4 +1,4 @@
-package org.rhea_core.distribution.tasks;
+package org.rhea_core.distribution;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;

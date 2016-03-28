@@ -6,6 +6,7 @@ import org.rhea_core.internal.expressions.combining.MergeMultiExpr;
 import org.rhea_core.internal.expressions.filtering.DistinctExpr;
 import org.rhea_core.internal.expressions.filtering.FilterExpr;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
+import org.rhea_core.internal.expressions.filtering.TakeExpr;
 import org.rhea_core.internal.expressions.transformational.MapExpr;
 import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.graph.SimpleEdge;
@@ -22,9 +23,10 @@ public class ProactiveFiltering implements Optimizer {
             Transformer source = edge.getSource();
             Transformer target = edge.getTarget();
 
-            // map -> skip|distinct
+            // map -> take|skip|distinct
             if ((source instanceof MapExpr && target instanceof SkipExpr)
-            ||  (source instanceof MapExpr && target instanceof DistinctExpr))
+            ||  (source instanceof MapExpr && target instanceof DistinctExpr)
+            ||  (source instanceof MapExpr && target instanceof TakeExpr))
                 graph.reorder(source, target);
             // map -> filter
             else if (source instanceof MapExpr && target instanceof FilterExpr) {
