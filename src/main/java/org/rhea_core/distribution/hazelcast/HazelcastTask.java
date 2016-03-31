@@ -1,9 +1,8 @@
-package org.rhea_core.distribution;
+package org.rhea_core.distribution.hazelcast;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import org.rhea_core.Stream;
-import org.rhea_core.distribution.hazelcast.HazelcastTopic;
 import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.output.Output;
 import org.rhea_core.util.functions.Func0;
@@ -12,7 +11,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StreamTask implements Runnable, Serializable, HazelcastInstanceAware {
+public class HazelcastTask implements Runnable, Serializable, HazelcastInstanceAware {
 
     private HazelcastInstance hazelcast;
 
@@ -21,14 +20,14 @@ public class StreamTask implements Runnable, Serializable, HazelcastInstanceAwar
     protected Output output;
     private List<String> requiredAttributes;
 
-    public StreamTask(Func0<EvaluationStrategy> strategyGenerator, Stream stream, Output output) {
+    public HazelcastTask(Func0<EvaluationStrategy> strategyGenerator, Stream stream, Output output) {
         this.strategyGenerator = strategyGenerator;
         this.stream = stream;
         this.output = output;
         requiredAttributes = new ArrayList<>();
     }
 
-    public StreamTask(Func0<EvaluationStrategy> strategyGenerator, Stream stream, Output output, List<String> requiredAttributes) {
+    public HazelcastTask(Func0<EvaluationStrategy> strategyGenerator, Stream stream, Output output, List<String> requiredAttributes) {
         this.strategyGenerator = strategyGenerator;
         this.stream = stream;
         this.output = output;

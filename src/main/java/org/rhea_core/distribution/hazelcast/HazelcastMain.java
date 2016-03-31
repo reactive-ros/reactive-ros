@@ -11,7 +11,7 @@ public class HazelcastMain {
         Hazelcast.newHazelcastInstance(config);
 
         // Setup network configuration
-        /*List<String> addresses = machines.stream().map(MachineInfo::hostname).collect(Collectors.toList());
+        /*List<String> addresses = machines.stream().map(::hostname).collect(Collectors.toList());
         Config cfg = new Config();
         NetworkConfig network = cfg.getNetworkConfig();
         network.setReuseAddress(true);

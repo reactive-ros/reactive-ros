@@ -1,13 +1,12 @@
-package org.rhea_core.distribution;
+package org.rhea_core.distribution.hazelcast;
 
 import com.hazelcast.core.*;
 import org.jgrapht.traverse.BreadthFirstIterator;
 import org.rhea_core.Stream;
-import org.rhea_core.distribution.annotations.MachineInfo;
+import org.rhea_core.distribution.DistributionStrategy;
 import org.rhea_core.distribution.annotations.StrategyInfo;
 import org.rhea_core.distribution.graph.DistributedGraph;
 import org.rhea_core.distribution.graph.TopicEdge;
-import org.rhea_core.distribution.hazelcast.HazelcastTopic;
 import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.expressions.MultipleInputExpr;
 import org.rhea_core.internal.expressions.NoInputExpr;
@@ -18,6 +17,7 @@ import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.output.MultipleOutput;
 import org.rhea_core.internal.output.Output;
 import org.rhea_core.internal.output.SinkOutput;
+import org.rhea_core.network.Machine;
 import org.rhea_core.util.ReflectionUtils;
 import org.rhea_core.util.functions.Func0;
 
@@ -26,26 +26,26 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
-public class Distributor {
+public class HazelcastDistributionStrategy implements DistributionStrategy {
     HazelcastInstance hazelcast;
-    List<MachineInfo> machines;
+    List<Machine> machines;
     List<StrategyInfo> strategies;
     int desiredGranularity;
 
     Func0<EvaluationStrategy> strategy;
 
-    public Distributor(HazelcastInstance hazelcast) {
-        machines = ReflectionUtils.getMachines();
+    public HazelcastDistributionStrategy(HazelcastInstance hazelcast) {
+//        machines = ReflectionUtils.getMachines();
         strategies = ReflectionUtils.getStrategies();
-        desiredGranularity = machines.stream().map(MachineInfo::cores).reduce((i1, i2) -> i1 + i2).get();
+        desiredGranularity = machines.stream().map(Machine::cores).reduce((i1, i2) -> i1 + i2).get();
         this.hazelcast = hazelcast;
     }
 
-    public Distributor() {
+    public HazelcastDistributionStrategy() {
         this(Hazelcast.newHazelcastInstance());
     }
 
-    public Distributor(Func0<EvaluationStrategy> strategy) {
+    public HazelcastDistributionStrategy(Func0<EvaluationStrategy> strategy) {
         this(Hazelcast.newHazelcastInstance());
         this.strategy = strategy;
     }
@@ -60,11 +60,11 @@ public class Distributor {
 
         DistributedGraph graph = new DistributedGraph(stream.getGraph(), this::newTopic);
 
-        Queue<StreamTask> tasks = new LinkedList<>();
+        Queue<HazelcastTask> tasks = new LinkedList<>();
 
         // Run output node first
         HazelcastTopic result = newTopic();
-        tasks.add(new StreamTask(strategy, Stream.from(result), output, new ArrayList<>()));
+        tasks.add(new HazelcastTask(strategy, Stream.from(result), output, new ArrayList<>()));
 
         // Then run each graph vertex as an individual node (reverse BFS)
         Set<Transformer> checked = new HashSet<>();
@@ -110,7 +110,7 @@ public class Distributor {
             Output outputToExecute = (list.size() == 1) ? list.get(0) : new MultipleOutput(list);
 
             // Schedule for execution
-            tasks.add(new StreamTask(strategy, new Stream(innerGraph), outputToExecute, new ArrayList<>()));
+            tasks.add(new HazelcastTask(strategy, new Stream(innerGraph), outputToExecute, new ArrayList<>()));
 
             checked.add(toExecute);
         }
@@ -128,10 +128,10 @@ public class Distributor {
     }
 
     /**
-     * Executes the given {@link StreamTask}s on the current cluster.
-     * @param tasks the {@link StreamTask}s to execute
+     * Executes the given {@link HazelcastTask}s on the current cluster.
+     * @param tasks the {@link HazelcastTask}s to execute
      */
-    private void submit(Queue<? extends StreamTask> tasks) {
+    private void submit(Queue<? extends HazelcastTask> tasks) {
         IExecutorService executorService = hazelcast.getExecutorService("ex");
         Set<Member> members = hazelcast.getCluster().getMembers();
 
@@ -145,7 +145,7 @@ public class Distributor {
         // Profile network cost (and operator cost) to determine optimal placement.
 
         // Execute tasks
-        StreamTask task;
+        HazelcastTask task;
         while ((task = tasks.poll()) != null)
             executorService.execute(task);
     }

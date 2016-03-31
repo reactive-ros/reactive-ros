@@ -1,4 +1,4 @@
-package org.rhea_core.distribution;
+package org.rhea_core.network;
 
 import java.util.Collections;
 import java.util.List;

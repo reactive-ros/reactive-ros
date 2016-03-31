@@ -1,7 +1,6 @@
-package org.rhea_core.distribution.annotations.machines;
+package org.rhea_core.network;
 
-import org.rhea_core.distribution.Machine;
-import org.rhea_core.distribution.annotations.MachineInfo;
+import org.rhea_core.network.Machine;
 
 import java.util.Arrays;
 import java.util.List;

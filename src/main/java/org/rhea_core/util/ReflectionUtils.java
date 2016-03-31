@@ -1,8 +1,6 @@
 package org.rhea_core.util;
 
-import org.rhea_core.distribution.annotations.MachineInfo;
 import org.rhea_core.distribution.annotations.StrategyInfo;
-import org.rhea_core.distribution.Machine;
 import org.rhea_core.evaluation.EvaluationStrategy;
 import org.reflections.Reflections;
 
@@ -38,14 +36,6 @@ public final class ReflectionUtils {
                 .stream()
                 .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
                 .map(c -> c.getAnnotation(StrategyInfo.class))
-                .collect(Collectors.toList());
-    }
-
-    public static List<MachineInfo> getMachines() {
-        return reflections.getSubTypesOf(Machine.class)
-                .stream()
-                .filter(c -> !c.isInterface() && !Modifier.isAbstract(c.getModifiers()))
-                .map(c -> c.getAnnotation(MachineInfo.class))
                 .collect(Collectors.toList());
     }
 }

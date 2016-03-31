@@ -31,6 +31,9 @@ dependencies {
   // Reflection
   compile 'org.reflections:reflections:0.9.10'
 
+  // Tuples
+  compile 'org.javatuples:javatuples:1.2'
+
   // Testing
   testCompile 'junit:junit:4.11'
   testCompile 'com.github.rhea-flow:test-data:-SNAPSHOT'

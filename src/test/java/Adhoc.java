@@ -1,7 +1,6 @@
 import graph_viz.GraphVisualizer;
 import org.junit.Test;
 import org.rhea_core.Stream;
-import org.rhea_core.distribution.Distributor;
 import test_data.utilities.Threads;
 
 /**

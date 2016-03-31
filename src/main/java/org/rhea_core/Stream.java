@@ -1,6 +1,6 @@
 package org.rhea_core;
 
-import org.rhea_core.distribution.Distributor;
+import org.rhea_core.distribution.hazelcast.HazelcastDistributionStrategy;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.*;
 import org.rhea_core.internal.expressions.combining.*;
@@ -59,9 +59,9 @@ public class Stream<T> implements Serializable { // TODO create
     private Transformer toConnect;
 
     /**
-     * The {@link Distributor} to use.
+     * The {@link HazelcastDistributionStrategy} to use.
      */
-    private static Distributor distributor;
+    private static HazelcastDistributionStrategy hazelcastDistributionStrategy;
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -83,10 +83,10 @@ public class Stream<T> implements Serializable { // TODO create
 
     /**
      * Must always be set prior to usage.
-     * @param distributor the {@link Distributor} to use for evaluating this {@link Stream}
+     * @param hazelcastDistributionStrategy the {@link HazelcastDistributionStrategy} to use for evaluating this {@link Stream}
      */
-    public static void configure(Distributor distributor) {
-        Stream.distributor = distributor;
+    public static void configure(HazelcastDistributionStrategy hazelcastDistributionStrategy) {
+        Stream.hazelcastDistributionStrategy = hazelcastDistributionStrategy;
     }
 
     /**
@@ -641,15 +641,15 @@ public class Stream<T> implements Serializable { // TODO create
      *  Evaluation
      */
     private void subscribe(Output output) {
-        if (distributor == null)
-            distributor = new Distributor();
+        if (hazelcastDistributionStrategy == null)
+            hazelcastDistributionStrategy = new HazelcastDistributionStrategy();
 
         // Optimize
         new ProactiveFiltering().optimize(graph);
-        new NodeMerger(distributor.getDesiredGranularity()).optimize(graph);
+        new NodeMerger(hazelcastDistributionStrategy.getDesiredGranularity()).optimize(graph);
 
         // Evaluate
-        distributor.evaluate(new Stream(graph), output);
+        hazelcastDistributionStrategy.evaluate(new Stream(graph), output);
     }
 
     // Expose convenient method calls
