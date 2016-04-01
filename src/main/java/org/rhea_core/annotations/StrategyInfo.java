@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Arrays;
 
 /**
  * @author Orestis Melkonian
@@ -12,6 +13,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface StrategyInfo {
     String name();
-    String[] requiredSkills() default "";
+    String[] requiredSkills() default {};
     int priority() default 0;
 }
