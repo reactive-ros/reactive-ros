@@ -25,12 +25,6 @@ dependencies {
   // Serialization
   compile 'com.cedarsoftware:json-io:4.1.9'
 
-  // Distribution
-  compile 'com.hazelcast:hazelcast:3.6'
-
-  // Reflection
-  compile 'org.reflections:reflections:0.9.10'
-
   // Tuples
   compile 'org.javatuples:javatuples:1.2'
 

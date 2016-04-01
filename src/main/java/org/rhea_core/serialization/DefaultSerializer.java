@@ -2,7 +2,7 @@ package org.rhea_core.serialization;
 
 import com.cedarsoftware.util.io.JsonReader;
 import com.cedarsoftware.util.io.JsonWriter;
-import org.rhea_core.internal.notifications.Notification;
+import org.rhea_core.internal.Notification;
 import java.nio.charset.Charset;
 
 /**

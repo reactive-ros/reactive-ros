@@ -1,4 +1,4 @@
-package org.rhea_core.internal.notifications;
+package org.rhea_core.internal;
 
 import org.rhea_core.Stream;
 

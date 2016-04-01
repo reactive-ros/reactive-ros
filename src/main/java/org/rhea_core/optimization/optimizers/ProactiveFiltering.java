@@ -1,4 +1,4 @@
-package org.rhea_core.optimization;
+package org.rhea_core.optimization.optimizers;
 
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.combining.ConcatMultiExpr;

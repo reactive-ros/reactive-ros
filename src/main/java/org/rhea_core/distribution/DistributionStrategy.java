@@ -8,5 +8,5 @@ import org.rhea_core.internal.output.Output;
  */
 public interface DistributionStrategy {
     int getDesiredGranularity();
-    void evaluate(Stream stream, Output output);
+    void distribute(Stream stream, Output output);
 }

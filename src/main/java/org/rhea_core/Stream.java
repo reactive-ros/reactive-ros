@@ -1,6 +1,6 @@
 package org.rhea_core;
 
-import org.rhea_core.distribution.hazelcast.HazelcastDistributionStrategy;
+import org.rhea_core.distribution.DistributionStrategy;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.*;
 import org.rhea_core.internal.expressions.combining.*;
@@ -22,10 +22,10 @@ import org.rhea_core.io.Listener;
 import org.rhea_core.io.Sink;
 import org.rhea_core.io.Source;
 import org.rhea_core.internal.graph.FlowGraph;
-import org.rhea_core.internal.notifications.Notification;
+import org.rhea_core.internal.Notification;
+import org.rhea_core.optimization.DefaultOptimizationStrategy;
+import org.rhea_core.optimization.OptimizationStrategy;
 import org.rhea_core.serialization.Serializer;
-import org.rhea_core.optimization.NodeMerger;
-import org.rhea_core.optimization.ProactiveFiltering;
 import org.rhea_core.util.functions.*;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
 import org.rhea_core.internal.expressions.filtering.TakeExpr;
@@ -59,9 +59,14 @@ public class Stream<T> implements Serializable { // TODO create
     private Transformer toConnect;
 
     /**
-     * The {@link HazelcastDistributionStrategy} to use.
+     * The {@link DistributionStrategy} to use.
      */
-    private static HazelcastDistributionStrategy hazelcastDistributionStrategy;
+    private static DistributionStrategy distributionStrategy;
+
+    /**
+     * The {@link org.rhea_core.optimization.OptimizationStrategy} to use.
+     */
+    private static OptimizationStrategy optimizationStrategy;
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -82,11 +87,16 @@ public class Stream<T> implements Serializable { // TODO create
     }
 
     /**
-     * Must always be set prior to usage.
-     * @param hazelcastDistributionStrategy the {@link HazelcastDistributionStrategy} to use for evaluating this {@link Stream}
+     * Must always be called prior to usage.
+     * @param distributionStrategy the {@link DistributionStrategy} to use for evaluating this {@link Stream}
      */
-    public static void configure(HazelcastDistributionStrategy hazelcastDistributionStrategy) {
-        Stream.hazelcastDistributionStrategy = hazelcastDistributionStrategy;
+    public static void configure(DistributionStrategy distributionStrategy) {
+        Stream.distributionStrategy = distributionStrategy;
+    }
+
+    public static void configure(DistributionStrategy distributionStrategy, OptimizationStrategy optimizationStrategy) {
+        Stream.distributionStrategy = distributionStrategy;
+        Stream.optimizationStrategy = optimizationStrategy;
     }
 
     /**
@@ -632,24 +642,24 @@ public class Stream<T> implements Serializable { // TODO create
     }
 
     public static Stream<Integer> nat() {
-        return Stream.just(1)
-                .loop(s -> s.map(i -> i + 1))
-                .startWith(1);
+        return Stream.just(0)
+                .loop(s -> s.map(i -> i + 1));
     }
 
     /**
      *  Evaluation
      */
     private void subscribe(Output output) {
-        if (hazelcastDistributionStrategy == null)
-            hazelcastDistributionStrategy = new HazelcastDistributionStrategy();
+        if (distributionStrategy == null)
+            throw new RuntimeException("DistributionStrategy not set");
+        if (optimizationStrategy == null)
+            optimizationStrategy = new DefaultOptimizationStrategy(distributionStrategy.getDesiredGranularity());
 
         // Optimize
-        new ProactiveFiltering().optimize(graph);
-        new NodeMerger(hazelcastDistributionStrategy.getDesiredGranularity()).optimize(graph);
+        optimizationStrategy.optimize(graph);
 
         // Evaluate
-        hazelcastDistributionStrategy.evaluate(new Stream(graph), output);
+        distributionStrategy.distribute(new Stream(graph), output);
     }
 
     // Expose convenient method calls
