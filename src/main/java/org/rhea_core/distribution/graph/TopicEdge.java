@@ -1,9 +1,9 @@
 package org.rhea_core.distribution.graph;
 
 import org.jgrapht.graph.DefaultEdge;
-import org.rhea_core.distribution.hazelcast.HazelcastTopic;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.graph.SimpleEdge;
+import org.rhea_core.io.AbstractTopic;
 
 /**
  * @author Orestis Melkonian
@@ -11,18 +11,18 @@ import org.rhea_core.internal.graph.SimpleEdge;
 public class TopicEdge extends DefaultEdge {
     private Transformer source;
     private Transformer target;
-    private HazelcastTopic topic;
+    private AbstractTopic topic;
 
-    public TopicEdge(Transformer v1, Transformer v2, HazelcastTopic topic) {
+    public TopicEdge(Transformer v1, Transformer v2, AbstractTopic topic) {
         this.source = v1;
         this.target = v2;
         this.topic = topic;
     }
-    public TopicEdge(SimpleEdge e, HazelcastTopic topic) {
+    public TopicEdge(SimpleEdge e, AbstractTopic topic) {
         this(e.getSource(), e.getTarget(), topic);
     }
 
-    public HazelcastTopic getTopic() {
+    public AbstractTopic getTopic() {
         return topic;
     }
 

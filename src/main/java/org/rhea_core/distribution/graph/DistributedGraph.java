@@ -1,10 +1,10 @@
 package org.rhea_core.distribution.graph;
 
 import org.jgrapht.graph.DirectedPseudograph;
-import org.rhea_core.distribution.hazelcast.HazelcastTopic;
 import org.rhea_core.internal.expressions.NoInputExpr;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.graph.FlowGraph;
+import org.rhea_core.io.AbstractTopic;
 import org.rhea_core.util.functions.Func0;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class DistributedGraph extends DirectedPseudograph<Transformer, TopicEdge> {
     public Transformer toConnect;
 
-    public DistributedGraph(FlowGraph graph, Func0<HazelcastTopic> topicGenerator) {
+    public DistributedGraph(FlowGraph graph, Func0<AbstractTopic> topicGenerator) {
         super(TopicEdge.class);
         toConnect = graph.getConnectNode();
         graph.vertexSet().stream().forEach(this::addVertex);
