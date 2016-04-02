@@ -139,19 +139,21 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         SimpleEdge e = getEdge(source, target);
 
         if (e == null || successors(source).size() != 1) // cannot reorder when multiple connections exist
-            return;
+            throw new RuntimeException("Cannot reorder. More predecessors than 1.");
 
         removeEdge(e);
-        addEdge(target, source);
 
-        Transformer predecesssor = predecessor(source);
-        removeEdge(predecesssor, source);
-        addEdge(predecesssor, target);
+        for (Transformer predecessor : predecessors(source)) {
+            removeEdge(predecessor, source);
+            addEdge(predecessor, target);
+        }
 
         for (Transformer successor : successors(target)) {
             removeEdge(target, successor);
             addEdge(source, successor);
         }
+
+        addEdge(target, source);
 
         if (toConnect.equals(target))
             setConnectNode(source);

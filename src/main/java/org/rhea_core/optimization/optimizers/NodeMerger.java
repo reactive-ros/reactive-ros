@@ -18,7 +18,6 @@ import org.rhea_core.util.functions.Func1;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.StreamSupport;
 
 /**
  * @author Orestis Melkonian
@@ -42,7 +41,7 @@ public class NodeMerger implements Optimizer {
     public <T,R,R1,R2,T1,T2,T3,T4,T5,T6,T7,T8,T9,X1,X2,X3,X4,X5,X6,X7,X8,X9> 
     boolean merge(FlowGraph graph) {
         for (Transformer vertex : graph.vertices()) {
-            if (!graph.containsVertex(vertex)) continue;
+            assert graph.containsVertex(vertex);
             // Meaningless nevers
             if (vertex instanceof NeverExpr) {
                 if (!graph.singular(vertex)) continue;
@@ -98,11 +97,23 @@ public class NodeMerger implements Optimizer {
             ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> zip = (ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R>) vertex;
             int args = zip.getArgumentNo();
 
+            List<Transformer> predecessors = graph.predecessors(zip);
+
+            boolean mergePossible = false;
+            for (int i = 0; i < args; i++) {
+                Transformer pred = predecessors.get(i);
+                if (pred instanceof MapExpr && graph.singular(pred))
+                    mergePossible = true;
+            }
+
+            if (!mergePossible)
+                continue;
+
             Func1 f1=null,f2=null,f3=null,f4=null,f5=null,f6=null,f7=null,f8=null,f9=null;
             ZipExpr<X1,X2,X3,X4,X5,X6,X7,X8,X9,R> newZip = new ZipExpr<>(zip.type);
+            graph.addVertex(newZip);
 
-            List<Transformer> predecessors = graph.predecessors(zip);
-            for (int i = 1; i <= args; i++) {
+            for (int i = 0; i < args; i++) {
                 Transformer pred = predecessors.get(i);
                 Func1 f = null;
                 if (pred instanceof MapExpr && graph.singular(pred)) {
@@ -152,7 +163,12 @@ public class NodeMerger implements Optimizer {
                     newZip.combiner9 = (i1,i2,i3,i4,i5,i6,i7,i8,i9) -> zip.combiner9.call(
                             F1.call(i1),F2.call(i2),F3.call(i3),F4.call(i4),F5.call(i5),F6.call(i6),F7.call(i7),F8.call(i8), F9.call(i9)); break;
             }
+
+            for (Transformer successor : graph.successors(zip))
+                graph.addEdge(newZip, successor);
+
             graph.removeVertex(zip);
+
             return true;
         }
 
@@ -169,10 +185,10 @@ public class NodeMerger implements Optimizer {
                 merged = new MapExpr(i -> ((MapExpr) target).getMapper().call(((MapExpr) source).getMapper().call(i)));
             // from -> map
             else if (source instanceof FromExpr && target instanceof MapExpr && singular) {
-                Iterable newCollection =
-                        StreamSupport
-                                .stream(((FromExpr<? extends T>) source).getCollection().spliterator(), false)
-                                .map(i -> ((MapExpr<? super T, ? extends R>) target).getMapper().call(i))::iterator;
+                Func1<? super T, ? extends R> func = ((MapExpr<? super T, ? extends R>) target).getMapper();
+                List newCollection = new ArrayList<>();
+                for (T item : ((FromExpr<? extends T>) source).getCollection())
+                    newCollection.add(func.call(item));
                 merged = new FromExpr(newCollection);
             }
             // from -> repeat
@@ -194,7 +210,7 @@ public class NodeMerger implements Optimizer {
             // filter -> exists
             else if (source instanceof FilterExpr && target instanceof ExistsExpr && singular)
                 merged = new ExistsExpr(i -> ((Boolean) (((FilterExpr) source).getPredicate()).call(i))
-                                          && ((Boolean) (((ExistsExpr) target).getPredicate()).call(i)));
+                        && ((Boolean) (((ExistsExpr) target).getPredicate()).call(i)));
             // zip -> map
             else if (source instanceof ZipExpr && target instanceof MapExpr && singular) {
                 ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9, R1> zip = (ZipExpr) source;
