@@ -44,9 +44,9 @@ public class FromExpr<T> extends NoInputExpr<T> implements Transformer<T> {
 
         Iterator<? extends T> it1 = collection.iterator();
         Iterator<? extends T> it2 = ((FromExpr<T>) obj).getCollection().iterator();
-        while (it1.hasNext())
+        while (it1.hasNext() && it2.hasNext())
             if (!it1.next().equals(it2.next()))
                 return false;
-        return (!it2.hasNext());
+        return (!it1.hasNext() && !it2.hasNext());
     }
 }
