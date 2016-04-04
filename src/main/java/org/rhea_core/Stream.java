@@ -1,5 +1,6 @@
 package org.rhea_core;
 
+import graph_viz.GraphVisualizer;
 import org.rhea_core.distribution.DistributionStrategy;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.*;
@@ -171,10 +172,8 @@ public class Stream<T> implements Serializable { // TODO create
      * Single Input
      * ======================================================= */
     private <R> Stream<R> attach(Transformer<R> expr) {
-        graph.addVertex(expr);
-        graph.addEdge(toConnect, expr);
-        graph.setConnectNode(expr);
-        return new Stream<>(graph, expr);
+        graph.attach(expr);
+        return new Stream<>(graph);
     }
     // =======================================================
     /**
@@ -184,10 +183,9 @@ public class Stream<T> implements Serializable { // TODO create
         ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
         graph.addVertex(merge);
         graph.attach(merge);
-        toConnect = graph.getConnectNode();
+        toConnect = merge;
 
         FlowGraph newGraph = streamFunc.call(this).getGraph();
-
         newGraph.addEdge(newGraph.getConnectNode(), merge);
         newGraph.setConnectNode(merge);
 

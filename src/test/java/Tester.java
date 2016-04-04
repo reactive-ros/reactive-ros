@@ -20,8 +20,6 @@ public class Tester {
 
     @Test
     public void serialization() {
-
-        // Streams & Outputs
         java.util.stream.Stream.concat(
                 Collections.streams().stream(),
                 Collections.outputs().stream()
