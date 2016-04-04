@@ -27,9 +27,10 @@ public class FromExpr<T> extends NoInputExpr<T> implements Transformer<T> {
 
     @Override
     public Transformer<T> clone() {
-        List<T> copied = new ArrayList<>();
+        /*List<T> copied = new ArrayList<>();
         collection.iterator().forEachRemaining(copied::add);
-        return new FromExpr<>(copied);
+        return new FromExpr<>(copied);*/
+        return new FromExpr<>(collection);
     }
 
     @Override

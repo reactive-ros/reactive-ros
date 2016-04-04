@@ -1,8 +1,10 @@
 import graph_viz.GraphVisualizer;
+import org.javatuples.Pair;
 import org.junit.Test;
 import org.rhea_core.Stream;
 import test_data.utilities.Threads;
 
+import javax.swing.*;
 import java.util.PriorityQueue;
 
 /**
@@ -12,16 +14,20 @@ public class Adhoc {
     @Test
     public void test() throws InterruptedException {
 
-        Stream<?> stream = Stream.just(1).loop(e -> {
-            IntStream s = new IntStream(e);
-            return IntStream.mergeSort(
-                    IntStream.mergeSort(s.multiply(2), s.multiply(3)),
-                    s.multiply(5)
-            );
-        })
-        .startWith(1)
-        .distinct()
-        .take(20);
+        Stream<?> stream = Stream.using(
+                () -> new Pair<>(new PriorityQueue<Integer>(), new PriorityQueue<Integer>()),
+                queues -> Stream.just(1).loop(e -> {
+                    IntStream s = new IntStream(e);
+                    return IntStream.mergeSort(
+                            IntStream.mergeSort(s.multiply(2), s.multiply(3), queues.getValue0()),
+                            s.multiply(5),
+                            queues.getValue1()
+                    );
+                })
+                .startWith(1)
+                .distinct()
+                .take(20),
+                queues -> System.out.print(""));
 
         GraphVisualizer.display(stream);
         Threads.sleep();
@@ -33,8 +39,7 @@ public class Adhoc {
             return new IntStream(this.map(i -> i * constant));
         }
 
-        public static Stream<Integer> mergeSort(Stream<Integer> fst, Stream<Integer> snd) {
-            PriorityQueue<Integer> queue = new PriorityQueue<>();
+        public static Stream<Integer> mergeSort(Stream<Integer> fst, Stream<Integer> snd, PriorityQueue<Integer> queue) {
             return Stream.<Integer, Integer, Integer>zip(
                     fst, snd,
                     (x, y) -> {
