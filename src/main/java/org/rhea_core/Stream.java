@@ -1,6 +1,5 @@
 package org.rhea_core;
 
-import graph_viz.GraphVisualizer;
 import org.rhea_core.distribution.DistributionStrategy;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.*;
