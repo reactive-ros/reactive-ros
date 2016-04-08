@@ -6,10 +6,10 @@ import org.rhea_core.internal.Notification;
 import java.nio.charset.Charset;
 
 /**
- * Default serializer using JsonIO.
+ * Default SerializationStrategy using JsonIO.
  * @author Orestis Melkonian
  */
-public class DefaultSerializer implements Serializer<byte[]> {
+public class DefaultSerializationStrategy implements SerializationStrategy<byte[]> {
     private static final String complete = "C";
     private static final String error = "E";
     private static final String next = "N";

@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @param <B> the cross-machine representation of bytes
  * @author Orestis Melkonian
  */
-public interface Serializer<B> extends Serializable {
+public interface SerializationStrategy<B> extends Serializable {
 
     /**
      * Serializes given {@link Object}.

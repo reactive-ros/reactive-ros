@@ -25,7 +25,7 @@ import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.Notification;
 import org.rhea_core.optimization.DefaultOptimizationStrategy;
 import org.rhea_core.optimization.OptimizationStrategy;
-import org.rhea_core.serialization.Serializer;
+import org.rhea_core.serialization.SerializationStrategy;
 import org.rhea_core.util.functions.*;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
 import org.rhea_core.internal.expressions.filtering.TakeExpr;
@@ -342,22 +342,22 @@ public class Stream<T> implements Serializable { // TODO create
         return attach(new DematerializeExpr<>());
     }
     /**
-     * Serializes this {@link Stream} using given {@link Serializer}.
-     * @param ser the {@link Serializer} to use
-     * @param <B> the byte representation used by the {@link Serializer}
+     * Serializes this {@link Stream} using given {@link SerializationStrategy}.
+     * @param ser the {@link SerializationStrategy} to use
+     * @param <B> the byte representation used by the {@link SerializationStrategy}
      * @return the serialized {@link Stream}
      */
-    public <B> Stream<B> serialize(Serializer<B> ser) {
+    public <B> Stream<B> serialize(SerializationStrategy<B> ser) {
         return this.materialize()
                    .map(ser::serialize);
     }
     /**
-     * Deserializes this {@link Stream} using given {@link Serializer}.
-     * @param ser the {@link Serializer} to use
-     * @param <B> the byte representation used by the {@link Serializer}
+     * Deserializes this {@link Stream} using given {@link SerializationStrategy}.
+     * @param ser the {@link SerializationStrategy} to use
+     * @param <B> the byte representation used by the {@link SerializationStrategy}
      * @return the deserialized {@link Stream}
      */
-    public <B, T2> Stream<T2> deserialize(Serializer<B> ser) {
+    public <B, T2> Stream<T2> deserialize(SerializationStrategy<B> ser) {
         return this.map(m -> ser.deserialize(((B) m)))
                    .dematerialize();
     }
