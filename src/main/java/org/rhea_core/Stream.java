@@ -25,6 +25,7 @@ import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.internal.Notification;
 import org.rhea_core.optimization.DefaultOptimizationStrategy;
 import org.rhea_core.optimization.OptimizationStrategy;
+import org.rhea_core.serialization.DefaultSerializationStrategy;
 import org.rhea_core.serialization.SerializationStrategy;
 import org.rhea_core.util.functions.*;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
@@ -64,9 +65,14 @@ public class Stream<T> implements Serializable { // TODO create
     private static DistributionStrategy distributionStrategy;
 
     /**
+     * The {@link SerializationStrategy} to use.
+     */
+    private static SerializationStrategy serializationStrategy = new DefaultSerializationStrategy();
+
+    /**
      * The {@link org.rhea_core.optimization.OptimizationStrategy} to use.
      */
-    private static OptimizationStrategy optimizationStrategy;
+    private static OptimizationStrategy optimizationStrategy = new DefaultOptimizationStrategy(Runtime.getRuntime().availableProcessors());
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
@@ -84,19 +90,6 @@ public class Stream<T> implements Serializable { // TODO create
 
     public Transformer getToConnect() {
         return toConnect;
-    }
-
-    /**
-     * Must always be called prior to usage.
-     * @param distributionStrategy the {@link DistributionStrategy} to use for evaluating this {@link Stream}
-     */
-    public static void configure(DistributionStrategy distributionStrategy) {
-        Stream.distributionStrategy = distributionStrategy;
-    }
-
-    public static void configure(DistributionStrategy distributionStrategy, OptimizationStrategy optimizationStrategy) {
-        Stream.distributionStrategy = distributionStrategy;
-        Stream.optimizationStrategy = optimizationStrategy;
     }
 
     /**
@@ -649,8 +642,6 @@ public class Stream<T> implements Serializable { // TODO create
     private void subscribe(Output output) {
         if (distributionStrategy == null)
             throw new RuntimeException("DistributionStrategy not set");
-        if (optimizationStrategy == null)
-            optimizationStrategy = new DefaultOptimizationStrategy(distributionStrategy.getDesiredGranularity());
 
         // Optimize
         optimizationStrategy.optimize(graph);
