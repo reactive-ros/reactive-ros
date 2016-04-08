@@ -62,17 +62,17 @@ public class Stream<T> implements Serializable { // TODO create
     /**
      * The {@link DistributionStrategy} to use.
      */
-    private static DistributionStrategy distributionStrategy;
+    public static DistributionStrategy distributionStrategy;
 
     /**
      * The {@link SerializationStrategy} to use.
      */
-    private static SerializationStrategy serializationStrategy = new DefaultSerializationStrategy();
+    public static SerializationStrategy serializationStrategy = new DefaultSerializationStrategy();
 
     /**
      * The {@link org.rhea_core.optimization.OptimizationStrategy} to use.
      */
-    private static OptimizationStrategy optimizationStrategy = new DefaultOptimizationStrategy(Runtime.getRuntime().availableProcessors());
+    public static OptimizationStrategy optimizationStrategy = new DefaultOptimizationStrategy(Runtime.getRuntime().availableProcessors());
 
     public Stream(FlowGraph graph) {
         this.graph = graph;
