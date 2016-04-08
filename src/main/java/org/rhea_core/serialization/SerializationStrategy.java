@@ -7,22 +7,21 @@ import java.io.Serializable;
 
 /**
  * All (de)serializers used by any {@link EvaluationStrategy} should implement this interface.
- * @param <B> the cross-machine representation of bytes
  * @author Orestis Melkonian
  */
-public interface SerializationStrategy<B> extends Serializable {
+public interface SerializationStrategy extends Serializable {
 
     /**
      * Serializes given {@link Object}.
      * @param obj the {@link Object} to serialize
-     * @return an array of bytes
+     * @return the object serialized
      */
-    <T> B serialize(Notification<T> obj);
+    <T> byte[] serialize(Notification<T> obj);
 
     /**
      * Deserializes given array of bytes.
      * @param bytes the array of bytes to deserialize
      * @return the {@link Object} result from the deserialization
      */
-    <T> Notification<T> deserialize(B bytes);
+    Notification deserialize(byte[] bytes);
 }

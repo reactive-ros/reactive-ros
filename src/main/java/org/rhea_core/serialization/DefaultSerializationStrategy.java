@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
  * Default SerializationStrategy using JsonIO.
  * @author Orestis Melkonian
  */
-public class DefaultSerializationStrategy implements SerializationStrategy<byte[]> {
+public class DefaultSerializationStrategy implements SerializationStrategy {
     private static final String complete = "C";
     private static final String error = "E";
     private static final String next = "N";

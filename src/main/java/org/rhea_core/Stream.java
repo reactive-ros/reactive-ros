@@ -334,27 +334,6 @@ public class Stream<T> implements Serializable { // TODO create
     public <T2> Stream<T2> dematerialize() {
         return attach(new DematerializeExpr<>());
     }
-    /**
-     * Serializes this {@link Stream} using given {@link SerializationStrategy}.
-     * @param ser the {@link SerializationStrategy} to use
-     * @param <B> the byte representation used by the {@link SerializationStrategy}
-     * @return the serialized {@link Stream}
-     */
-    public <B> Stream<B> serialize(SerializationStrategy<B> ser) {
-        return this.materialize()
-                   .map(ser::serialize);
-    }
-    /**
-     * Deserializes this {@link Stream} using given {@link SerializationStrategy}.
-     * @param ser the {@link SerializationStrategy} to use
-     * @param <B> the byte representation used by the {@link SerializationStrategy}
-     * @return the deserialized {@link Stream}
-     */
-    public <B, T2> Stream<T2> deserialize(SerializationStrategy<B> ser) {
-        return this.map(m -> ser.deserialize(((B) m)))
-                   .dematerialize();
-    }
-
 
     /* =======================================================
      * Multiple Input
