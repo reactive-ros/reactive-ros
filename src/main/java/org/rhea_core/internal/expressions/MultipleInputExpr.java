@@ -6,7 +6,7 @@ package org.rhea_core.internal.expressions;
  * @author Orestis Melkonian
  */
 public class MultipleInputExpr<T> {
-    public int orderRef = 0;
+    public int orderRef;
     @Override
     public String toString() {
         return getClass().getSimpleName().replaceFirst("Expr", "");

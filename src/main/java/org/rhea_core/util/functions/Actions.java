@@ -4,7 +4,7 @@ package org.rhea_core.util.functions;
  * @author Orestis Melkonian
  */
 public final class Actions {
-    public final static EmptyAction EMPTY = new EmptyAction<>();
+    public static final EmptyAction EMPTY = new EmptyAction<>();
     private static final class EmptyAction<T0, T1, T2, T3, T4, T5, T6, T7, T8> implements
             Action0,
             Action1<T0>,

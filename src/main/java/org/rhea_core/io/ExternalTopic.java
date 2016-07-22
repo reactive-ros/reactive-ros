@@ -43,17 +43,17 @@ public abstract class ExternalTopic<T, C> implements Source<T>, Sink<T> {
                 .vertexSet()
                 .stream()
                 .filter(n -> n instanceof FromSource)
-                .map(n -> ((FromSource) n).getSource())
+                .map(n ->  ((FromSource) n).getSource())
                 .filter(s -> s instanceof ExternalTopic)
                 .map(s -> ((ExternalTopic) s))
                 .collect(Collectors.toList());
 
         if (output instanceof MultipleOutput) {
             for (Output out : ((MultipleOutput) output).getOutputs())
-                if (out instanceof SinkOutput && ((SinkOutput) out).getSink() instanceof ExternalTopic)
+                if ((out instanceof SinkOutput) && (((SinkOutput) out).getSink() instanceof ExternalTopic))
                     topics.add((ExternalTopic) ((SinkOutput) out).getSink());
         }
-        else if (output instanceof SinkOutput && ((SinkOutput) output).getSink() instanceof ExternalTopic)
+        else if ((output instanceof SinkOutput) && (((SinkOutput) output).getSink() instanceof ExternalTopic))
             topics.add((ExternalTopic) ((SinkOutput) output).getSink());
 
         return topics;
@@ -66,9 +66,9 @@ public abstract class ExternalTopic<T, C> implements Source<T>, Sink<T> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null
-                && obj instanceof ExternalTopic
-                && obj.getClass() == this.getClass()
+        return (obj != null)
+                && (obj instanceof ExternalTopic)
+                && (obj.getClass() == getClass())
                 && name.equals(((ExternalTopic) obj).getName());
     }
 }
