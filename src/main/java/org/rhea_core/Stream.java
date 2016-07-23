@@ -1,6 +1,8 @@
 package org.rhea_core;
 
 import org.rhea_core.distribution.DistributionStrategy;
+import org.rhea_core.distribution.SingleMachineDistributionStrategy;
+import org.rhea_core.evaluation.EvaluationStrategy;
 import org.rhea_core.internal.Notification;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.backpressure.BackpressureBufferExpr;
@@ -91,7 +93,7 @@ import java.util.stream.IntStream;
  */
 public class Stream<T> implements Serializable { // TODO create
 
-    public static boolean DEBUG;
+    public static boolean DEBUG = false;
 
     /**
      * The internal representation of this {@link Stream} as a {@link FlowGraph}.
@@ -102,6 +104,11 @@ public class Stream<T> implements Serializable { // TODO create
      * The {@link Transformer} to connect subsequent operations.
      */
     private Transformer toConnect;
+
+    /**
+     * The {@link EvaluationStrategy} to use.
+     */
+    public static EvaluationStrategy evaluationStrategy;
 
     /**
      * The {@link DistributionStrategy} to use.
@@ -511,7 +518,7 @@ public class Stream<T> implements Serializable { // TODO create
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#contains(java.lang.Object)">rx-java.contains</a> */
     public Stream<Boolean> contains(T obj) {
-        return exists(t -> (obj == null) ? t == null : t.equals(obj));
+        return exists(t -> (obj == null) ? (t == null) : t.equals(obj));
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#takeLast(int)">rx-java.takeLast</a> */
     public Stream<T> takeLast(int count) {
@@ -591,7 +598,7 @@ public class Stream<T> implements Serializable { // TODO create
     public Stream<T> repeat() {
         return repeat(-1);
     }
-    /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#range(int, int)">rx-java.range</a> */
+    /** @see <a href="http://reactivex.io/Rx    Java/javadoc/rx/Observable.html#range(int, int)">rx-java.range</a> */
     public static Stream<Integer> range(int start, int count) {
         return from(IntStream.range(start, start + count).boxed().toArray(Integer[]::new));
     }
@@ -663,8 +670,11 @@ public class Stream<T> implements Serializable { // TODO create
      *  Evaluation
      */
     private void subscribe(Output output) {
-        if (distributionStrategy == null)
-            throw new RuntimeException("DistributionStrategy not set");
+        if (distributionStrategy == null) {
+            if (evaluationStrategy == null)
+                throw new RuntimeException("DistributionStrategy or EvaluationStrategy not set.");
+            distributionStrategy = new SingleMachineDistributionStrategy(evaluationStrategy);
+        }
 
         // Optimize
         optimizationStrategy.optimize(graph);
@@ -701,7 +711,7 @@ public class Stream<T> implements Serializable { // TODO create
 
     @Override
     public boolean equals(Object obj) {
-        return obj != null && obj instanceof Stream && graph.equals(((Stream) obj).getGraph());
+        return (obj != null) && (obj instanceof Stream) && graph.equals(((Stream) obj).getGraph());
     }
     @Override
     public String toString() {
