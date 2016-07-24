@@ -90,20 +90,20 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
     public FlowGraph copy() {
         FlowGraph ret = new FlowGraph();
         Map<Transformer, Transformer> mapper = new HashMap<>();
-        this.vertexSet().stream().forEach(p -> {
+        vertexSet().stream().forEach(p -> {
             Transformer cl = p.clone();
             mapper.put(p, cl);
             ret.addVertex(cl);
         });
-        this.edgeSet().stream().forEach(e -> {
+        edgeSet().stream().forEach(e -> {
             Transformer source = mapper.get(e.getSource());
             Transformer target = mapper.get(e.getTarget());
             ret.addEdge(source, target, new SimpleEdge(source, target));
         });
-        if (this.toConnectMulti.isEmpty())
-            ret.addConnectVertex(mapper.get(this.getConnectNode()));
+        if (toConnectMulti.isEmpty())
+            ret.addConnectVertex(mapper.get(getConnectNode()));
         else
-            ret.setConnectNodes(this.toConnectMulti.stream().map(mapper::get).collect(Collectors.toList()));
+            ret.setConnectNodes(toConnectMulti.stream().map(mapper::get).collect(Collectors.toList()));
         return ret;
     }
 
@@ -118,7 +118,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
     public List<Transformer> predecessors(Transformer target) {
         return edgeSet().stream()
                 .filter(e -> e.getTarget().equals(target))
-                .sorted((e1, e2) -> e1.getOrder() < e2.getOrder() ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
+                .sorted((e1, e2) -> (e1.getOrder() < e2.getOrder()) ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
                 .map(SimpleEdge::getSource)
                 .collect(Collectors.toList());
     }
@@ -126,7 +126,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
     public List<Transformer> successors(Transformer source) {
         return edgeSet().stream()
                 .filter(e -> e.getSource().equals(source))
-                .sorted((e1, e2) -> e1.getOrder() < e2.getOrder() ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
+                .sorted((e1, e2) -> (e1.getOrder() < e2.getOrder()) ? -1 : e1.getOrder() > e2.getOrder() ? 1 : 0)
                 .map(SimpleEdge::getTarget)
                 .collect(Collectors.toList());
     }
@@ -138,7 +138,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
     public void reorder(Transformer source, Transformer target) {
         SimpleEdge e = getEdge(source, target);
 
-        if (e == null || successors(source).size() != 1) // cannot reorder when multiple connections exist
+        if ((e == null) || (successors(source).size() != 1)) // cannot reorder when multiple connections exist
             throw new RuntimeException("Cannot reorder. More predecessors than 1.");
 
         removeEdge(e);
@@ -162,7 +162,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
     public void reorder(Transformer source, Transformer target, Func0<Transformer> sourceGen, Func0<Transformer> targetGen) {
         SimpleEdge e = getEdge(source, target);
 
-        if (e == null || successors(source).size() != 1) // cannot reorder when multiple connections exist
+        if ((e == null) || (successors(source).size() != 1)) // cannot reorder when multiple connections exist
             return;
 
         Transformer newSource = sourceGen.call();
@@ -218,7 +218,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof FlowGraph))
+        if ((obj == null) || !(obj instanceof FlowGraph))
             return false;
         FlowGraph other = (FlowGraph) obj;
 
@@ -237,7 +237,7 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
 
     @Override
     public FlowGraph clone() {
-        return this.copy();
+        return copy();
     }
 
     @Override

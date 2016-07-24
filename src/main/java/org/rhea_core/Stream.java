@@ -61,6 +61,7 @@ import org.rhea_core.optimization.DefaultOptimizationStrategy;
 import org.rhea_core.optimization.OptimizationStrategy;
 import org.rhea_core.serialization.DefaultSerializationStrategy;
 import org.rhea_core.serialization.SerializationStrategy;
+import org.rhea_core.util.IdMinter;
 import org.rhea_core.util.functions.Action0;
 import org.rhea_core.util.functions.Action1;
 import org.rhea_core.util.functions.Action2;
@@ -149,7 +150,7 @@ public class Stream<T> implements Serializable { // TODO create
      */
     public Stream<T> copy() {
         FlowGraph copy = graph.copy();
-        return new Stream<>(copy, toConnect.clone());
+        return new Stream<>(copy);
     }
 
     /**
@@ -414,67 +415,67 @@ public class Stream<T> implements Serializable { // TODO create
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.functions.Func2)">rx-java.zip</a> */
     public static <T1,T2,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Func2<? super T1, ? super T2, R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.functions.Func3)">rx-java.zip</a> */
     public static <T1,T2,T3,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Func3<? super T1, ? super T2, ? super T3, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func4)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Func4<? super T1, ? super T2, ? super T3, ? super T4, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func5)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,T5,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Func5<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4, p5);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4, p5);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func6)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,T5,T6,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Func6<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4, p5, p6);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4, p5, p6);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func7)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Func7<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4, p5, p6, p7);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4, p5, p6, p7);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func8)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,T8,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Stream<? extends T8> p8, Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4, p5, p6, p7, p8);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4, p5, p6, p7, p8);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#zip(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func9)">rx-java.zip</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,T8,T9,R> Stream<R> zip(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Stream<? extends T8> p8, Stream<? extends T9> p9, Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("zip", combiner), p1, p2, p3, p4, p5, p6, p7, p8, p9);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "zip", combiner), p1, p2, p3, p4, p5, p6, p7, p8, p9);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.functions.Func2)">rx-java.combineLatest</a> */
     public static <T1,T2,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Func2<? super T1, ? super T2, R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.functions.Func3)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Func3<? super T1, ? super T2, ? super T3, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func4)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Func4<? super T1, ? super T2, ? super T3, ? super T4, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func5)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,T5,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Func5<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4, p5);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4, p5);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func6)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,T5,T6,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Func6<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4, p5, p6);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4, p5, p6);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func7)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Func7<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4, p5, p6, p7);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4, p5, p6, p7);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func8)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,T8,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Stream<? extends T8> p8, Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4, p5, p6, p7, p8);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4, p5, p6, p7, p8);
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#combineLatest(rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.Observable, rx.functions.Func9)">rx-java.combineLatest</a> */
     public static <T1,T2,T3,T4,T5,T6,T7,T8,T9,R> Stream<R> combineLatest(Stream<? extends T1> p1, Stream<? extends T2> p2, Stream<? extends T3> p3, Stream<? extends T4> p4, Stream<? extends T5> p5, Stream<? extends T6> p6, Stream<? extends T7> p7, Stream<? extends T8> p8, Stream<? extends T9> p9, Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner) {
-        return attachMulti(new ZipExpr<>("combine", combiner), p1, p2, p3, p4, p5, p6, p7, p8, p9);
+        return attachMulti(new ZipExpr<>(IdMinter.next(), "combine", combiner), p1, p2, p3, p4, p5, p6, p7, p8, p9);
     }
 
     /* =======================================================
@@ -662,8 +663,8 @@ public class Stream<T> implements Serializable { // TODO create
     }
 
     public static Stream<Integer> nat() {
-        return Stream.just(0)
-                .loop(s -> s.map(i -> i + 1));
+        return Stream.just(1)
+                     .loop(s -> s.map(i -> i + 1));
     }
 
     /**

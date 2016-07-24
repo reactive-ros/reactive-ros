@@ -40,7 +40,7 @@ public class FromExpr<T> extends NoInputExpr<T> implements Transformer<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof FromExpr))
+        if ((obj == null) || !(obj instanceof FromExpr))
             return false;
 
         Iterator<? extends T> it1 = collection.iterator();
@@ -48,6 +48,6 @@ public class FromExpr<T> extends NoInputExpr<T> implements Transformer<T> {
         while (it1.hasNext() && it2.hasNext())
             if (!it1.next().equals(it2.next()))
                 return false;
-        return (!it1.hasNext() && !it2.hasNext());
+        return !it1.hasNext() && !it2.hasNext();
     }
 }

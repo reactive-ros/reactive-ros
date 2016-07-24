@@ -2,23 +2,28 @@ import graph_viz.GraphVisualizer;
 import org.junit.Test;
 import org.junit.experimental.theories.suppliers.TestedOn;
 import org.rhea_core.Stream;
+import org.rhea_core.internal.expressions.combining.ZipExpr;
 import org.rhea_core.optimization.DefaultOptimizationStrategy;
 import org.rhea_core.optimization.OptimizationStrategy;
 import org.rhea_core.optimization.optimizers.NodeMerger;
 import org.rhea_core.optimization.optimizers.Optimizer;
 import org.rhea_core.optimization.optimizers.ProactiveFiltering;
+import org.rhea_core.util.IdMinter;
+
 import test_data.Collections;
 import test_data.utilities.Colors;
 import test_data.utilities.Threads;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Orestis Melkonian
  */
 public class Tester {
 
-    @Test
+//    @Test
     public void serialization() {
         java.util.stream.Stream.concat(
                 Collections.streams().stream(),
@@ -41,6 +46,19 @@ public class Tester {
             return false;
         }
         return true;
+    }
+
+    @Test
+    public void minter() {
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
+        new Thread(() -> System.out.println(IdMinter.next())).run();
     }
 
 //    @Test
