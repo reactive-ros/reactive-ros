@@ -27,22 +27,22 @@ public class ProactiveFiltering implements Optimizer {
                 Transformer target = edge.getTarget();
 
                 // map -> take|skip|distinct
-                if ((source instanceof MapExpr && target instanceof SkipExpr)
-                        || (source instanceof MapExpr && target instanceof DistinctExpr)
-                        || (source instanceof MapExpr && target instanceof TakeExpr)) {
+                if (((source instanceof MapExpr) && (target instanceof SkipExpr))
+                        || ((source instanceof MapExpr) && (target instanceof DistinctExpr))
+                        || ((source instanceof MapExpr) && (target instanceof TakeExpr))) {
                     graph.reorder(source, target);
                     changed = true;
                 }
                 // map -> filter
-                else if (source instanceof MapExpr && target instanceof FilterExpr) {
+                else if ((source instanceof MapExpr) && (target instanceof FilterExpr)) {
                     MapExpr map = (MapExpr) source;
                     FilterExpr filter = (FilterExpr) target;
                     graph.reorder(source, target, map::clone, () -> new FilterExpr<>(i -> ((Boolean) filter.getPredicate().call(map.getMapper().call(i)))));
                     changed = true;
                 }
                 // concat|merge -> distinct|filter
-                else if ((source instanceof ConcatMultiExpr || source instanceof MergeMultiExpr)
-                        && (target instanceof DistinctExpr || target instanceof FilterExpr)) {
+                else if (((source instanceof ConcatMultiExpr) || (source instanceof MergeMultiExpr))
+                        && ((target instanceof DistinctExpr) || (target instanceof FilterExpr))) {
                     for (Transformer pred : graph.predecessors(source)) {
                         graph.removeEdge(pred, source);
                         Transformer distinctClone = target.clone();

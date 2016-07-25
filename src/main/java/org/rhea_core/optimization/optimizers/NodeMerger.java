@@ -116,7 +116,7 @@ public class NodeMerger implements Optimizer {
 
             for (int i = 0; i < args; i++) {
                 Transformer pred = predecessors.get(i);
-                Func1 f = null;
+                Func1 f = x -> x;
                 if ((pred instanceof MapExpr) && graph.singular(pred)) {
                     f = ((MapExpr) pred).getMapper();
                     Transformer pred2 = graph.predecessor(pred);
@@ -127,7 +127,8 @@ public class NodeMerger implements Optimizer {
                     graph.addEdge(pred, newZip);
 
 
-                switch (i) {
+
+                switch (i + 1) {
                     case 1: f1 = f; break;
                     case 2: f2 = f; break;
                     case 3: f3 = f; break;
@@ -140,9 +141,9 @@ public class NodeMerger implements Optimizer {
                 }
             }
 
-            final Func1<X1, T1> F1 = f1; final Func1<X2, T2> F2 = f2; final Func1<X3, T3> F3 = f3;
-            final Func1<X4, T4> F4 = f4; final Func1<X5, T5> F5 = f5; final Func1<X6, T6> F6 = f6;
-            final Func1<X7, T7> F7 = f7; final Func1<X8, T8> F8 = f8; final Func1<X9, T9> F9 = f9;
+            Func1<X1, T1> F1 = f1; Func1<X2, T2> F2 = f2; Func1<X3, T3> F3 = f3;
+            Func1<X4, T4> F4 = f4; Func1<X5, T5> F5 = f5; Func1<X6, T6> F6 = f6;
+            Func1<X7, T7> F7 = f7; Func1<X8, T8> F8 = f8; Func1<X9, T9> F9 = f9;
 
             switch (args) {
                 case 2:
