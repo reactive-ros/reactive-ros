@@ -92,7 +92,7 @@ import java.util.stream.IntStream;
  * operators to compose complex dataflows.
  * @author Orestis Melkonian
  */
-public class Stream<T> implements Serializable { // TODO create
+public class Stream<T> implements Serializable {
 
     public static boolean DEBUG = false;
 

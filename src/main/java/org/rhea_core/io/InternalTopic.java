@@ -5,9 +5,9 @@ import org.rhea_core.serialization.SerializationStrategy;
 /**
  * @author Orestis Melkonian
  */
-public abstract class InternalTopic<T, C> extends ExternalTopic<T, C> {
+public abstract class InternalTopic<T, C, B> extends ExternalTopic<T, C> {
 
-    protected SerializationStrategy serializationStrategy;
+    protected SerializationStrategy<B> serializationStrategy;
 
     protected InternalTopic(String name, SerializationStrategy serializationStrategy) {
         super(name);
