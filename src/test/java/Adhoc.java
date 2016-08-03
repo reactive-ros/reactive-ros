@@ -13,6 +13,41 @@ import test_data.utilities.Threads;
 public class Adhoc {
 
     @Test
+    public void loop() {
+        Stream<Integer> s = Stream.just(0).loop(entry -> entry.map(i -> i + 1));
+        GraphVisualizer.display(s);
+
+        Threads.sleep();
+    }
+
+//    @Test
+    public void split() {
+
+        Stream<Integer> s0 = Stream.just(0, 1);
+
+        Stream<Integer> s1 = s0.map(i -> i + 1);
+        Stream<Integer> s2 = s0.map(i -> i + 1);
+
+        Stream<Integer> s3 = Stream.zip(s1, s2, (x, y) -> x);
+
+        System.out.println(s0.getToConnect());
+        System.out.println(s1.getToConnect());
+        System.out.println(s2.getToConnect());
+        System.out.println(s3.getToConnect());
+
+        GraphVisualizer.display(s3);
+
+        /*Stream<Integer> a1 = s1.map(i -> i + 1);
+        Stream<Integer> a2 = s1.map(i -> i + 2);
+
+        Stream<Integer> s = Stream.zip(a1, a2, (x, y) -> x + y);
+
+        GraphVisualizer.display(s);*/
+
+        Threads.sleep();
+    }
+
+//    @Test
     public void test() throws InterruptedException {
 
         Stream<?> stream = Stream.using(
@@ -55,7 +90,7 @@ public class Adhoc {
         }
 
         public IntStream(Stream<Integer> stream) {
-            super(stream.getGraph());
+            super(stream.getGraph(), null);
         }
     }
 }

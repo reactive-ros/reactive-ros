@@ -126,11 +126,6 @@ public class Stream<T> implements Serializable {
      */
     public static OptimizationStrategy optimizationStrategy = new DefaultOptimizationStrategy(Runtime.getRuntime().availableProcessors());
 
-    public Stream(FlowGraph graph) {
-        this.graph = graph;
-        this.toConnect = graph.getConnectNode();
-    }
-
     public Stream(FlowGraph graph, Transformer toConnect) {
         this.graph = graph;
         this.toConnect = toConnect;
@@ -150,7 +145,7 @@ public class Stream<T> implements Serializable {
      */
     public Stream<T> copy() {
         FlowGraph copy = graph.copy();
-        return new Stream<>(copy);
+        return new Stream<>(copy, copy.getConnectNode());
     }
 
     /**
@@ -216,8 +211,8 @@ public class Stream<T> implements Serializable {
      * Single Input
      * ======================================================= */
     private <R> Stream<R> attach(Transformer<R> expr) {
-        graph.attach(expr);
-        return new Stream<>(graph);
+        graph.attach(expr, toConnect);
+        return new Stream<>(graph, graph.getConnectNode());
     }
     // =======================================================
     /**
@@ -226,18 +221,17 @@ public class Stream<T> implements Serializable {
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
         ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
         graph.addVertex(merge);
-        graph.attach(merge);
+        graph.attach(merge, toConnect);
         toConnect = merge;
-
         FlowGraph newGraph = streamFunc.call(this).getGraph();
         newGraph.addEdge(newGraph.getConnectNode(), merge);
         newGraph.setConnectNode(merge);
 
-        return new Stream<>(newGraph);
+        return new Stream<>(newGraph, newGraph.getConnectNode());
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#map(rx.functions.Func1)">rx-java.map</a> */
     public <R> Stream<R> map(Func1<? super T, ? extends R> mapper) {
-        return attach(new MapExpr<>(mapper));
+        return attach(new MapExpr<>(IdMinter.next(), mapper));
     }
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#filter(rx.functions.Func1)">rx-java.filter</a> */
     public Stream<T> filter(Func1<? super T, Boolean> predicate) {
@@ -391,10 +385,9 @@ public class Stream<T> implements Serializable {
      * Multiple Input
      * ======================================================= */
     private static <R> Stream<R> attachMulti(Transformer<R> expr, Stream... streams) {
-        List<FlowGraph> inputs = Arrays.stream(streams).map(Stream::getGraph).collect(Collectors.toList());
-        FlowGraph ret = new FlowGraph(Arrays.asList(streams), inputs);
-        ret.attachMulti(expr);
-        return new Stream<>(ret, expr);
+        FlowGraph graph = FlowGraph.merge(streams);
+        graph.attachMulti(expr);
+        return new Stream<>(graph, expr);
     }
     // =======================================================
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#amb(java.lang.Iterable)">rx-java.amb</a> */
@@ -681,7 +674,7 @@ public class Stream<T> implements Serializable {
         optimizationStrategy.optimize(graph);
 
         // Evaluate
-        distributionStrategy.distribute(new Stream(graph), output);
+        distributionStrategy.distribute(new Stream(graph, graph.getConnectNode()), output);
     }
 
     // Expose convenient method calls

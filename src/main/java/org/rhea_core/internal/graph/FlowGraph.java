@@ -1,16 +1,20 @@
 package org.rhea_core.internal.graph;
 
-import org.rhea_core.Stream;
-import org.rhea_core.internal.expressions.NoInputExpr;
-import org.rhea_core.internal.expressions.SingleInputExpr;
-import org.rhea_core.internal.expressions.Transformer;
-import org.rhea_core.internal.expressions.feedback.EntryPointExpr;
 import org.jgrapht.EdgeFactory;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DirectedPseudograph;
+import org.rhea_core.Stream;
+import org.rhea_core.internal.expressions.NoInputExpr;
+import org.rhea_core.internal.expressions.Transformer;
+import org.rhea_core.internal.expressions.feedback.EntryPointExpr;
 import org.rhea_core.util.functions.Func0;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
@@ -26,25 +30,15 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         super(ef);
     }
 
-    public FlowGraph(FlowGraph other) {
-        super(ef);
-        setConnectNode(other.getConnectNode());
-        Graphs.addAllVertices(this, other.vertexSet());
-        Graphs.addAllEdges(this, other, other.edgeSet());
-    }
+    public static FlowGraph merge(Stream... streams) {
+        FlowGraph graph = new FlowGraph();
+        for (Stream s : streams) {
+            Graphs.addAllVertices(graph, s.getGraph().vertexSet());
+            Graphs.addAllEdges(graph, s.getGraph(), s.getGraph().edgeSet());
+            graph.addConnectNode(s.getToConnect());
+        }
 
-    public FlowGraph(List<Stream> streams, List<FlowGraph> graphs) {
-        super(ef);
-        toConnectMulti.clear();
-        // Copy nodes
-        for (FlowGraph graph : graphs)
-            Graphs.addAllVertices(this, graph.vertexSet());
-        // Copy edges
-        for (FlowGraph graph : graphs)
-            Graphs.addAllEdges(this, graph, graph.edgeSet());
-        // Set ConnectNodes
-        for (Stream stream : streams)
-            toConnectMulti.add(stream.getToConnect());
+        return graph;
     }
 
     public void setConnectNode(Transformer toConnect) {
@@ -56,12 +50,12 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         toConnectMulti.forEach(this::addVertex);
     }
 
-    public Transformer getConnectNode() {
-        return toConnect;
+    public void addConnectNode(Transformer toConnect) {
+        toConnectMulti.add(toConnect);
     }
 
-    public Transformer getEntryPoint() {
-        return vertexSet().stream().filter(n -> n instanceof EntryPointExpr).collect(Collectors.toList()).get(0);
+    public Transformer getConnectNode() {
+        return toConnect;
     }
 
     public void addConnectVertex(Transformer expr) {
@@ -69,7 +63,10 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         setConnectNode(expr);
     }
 
-    public void attach(Transformer newConnect) {
+    // Attach output node to given vertex of the current graph
+    public void attach(Transformer newConnect, Transformer toConnect) {
+        assert vertices().contains(toConnect);
+
         addVertex(newConnect);
         addEdge(toConnect, newConnect);
         setConnectNode(newConnect);
@@ -79,8 +76,9 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         addVertex(newConnect);
         for (Transformer p : toConnectMulti)
             addEdge(p, newConnect);
+
         setConnectNode(newConnect);
-//        toConnectMulti.clear();
+        toConnectMulti.clear();
     }
 
     public List<Transformer> getRoots() {

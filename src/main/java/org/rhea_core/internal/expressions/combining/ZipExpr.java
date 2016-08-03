@@ -34,42 +34,42 @@ public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr<Obj
     public ZipExpr(int id, String type, Func2<? super T1, ? super T2, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner2 = combiner;
+        combiner2 = combiner;
     }
     public ZipExpr(int id, String type, Func3<? super T1, ? super T2, ? super T3, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner3 = combiner;
+        combiner3 = combiner;
     }
     public ZipExpr(int id, String type, Func4<? super T1, ? super T2, ? super T3, ? super T4, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner4 = combiner;
+        combiner4 = combiner;
     }
     public ZipExpr(int id, String type, Func5<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner5 = combiner;
+        combiner5 = combiner;
     }
     public ZipExpr(int id, String type, Func6<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner6 = combiner;
+        combiner6 = combiner;
     }
     public ZipExpr(int id, String type, Func7<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner7 = combiner;
+        combiner7 = combiner;
     }
     public ZipExpr(int id, String type, Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner8 = combiner;
+        combiner8 = combiner;
     }
     public ZipExpr(int id, String type, Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner) {
         this(id);
         this.type = type;
-        this.combiner9 = combiner;
+        combiner9 = combiner;
     }
 
     public int getArgumentNo() {
@@ -108,6 +108,11 @@ public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr<Obj
         if (combiner4 != null) return new ZipExpr<>(id, type, combiner4);
         if (combiner3 != null) return new ZipExpr<>(id, type, combiner3);
         return new ZipExpr<>(id, type, combiner2);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + id;
     }
 }
 

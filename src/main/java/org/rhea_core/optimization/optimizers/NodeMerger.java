@@ -184,7 +184,7 @@ public class NodeMerger implements Optimizer {
 
             // map -> map
             if ((source instanceof MapExpr) && (target instanceof MapExpr) && singular)
-                merged = new MapExpr(i -> ((MapExpr) target).getMapper().call(((MapExpr) source).getMapper().call(i)));
+                merged = new MapExpr(IdMinter.next(), i -> ((MapExpr) target).getMapper().call(((MapExpr) source).getMapper().call(i)));
             // from -> map
             else if ((source instanceof FromExpr) && (target instanceof MapExpr) && singular) {
                 Func1<? super T, ? extends R> func = ((MapExpr<? super T, ? extends R>) target).getMapper();
