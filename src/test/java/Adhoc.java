@@ -3,6 +3,7 @@ import org.junit.Test;
 import org.rhea_core.Stream;
 
 import java.util.PriorityQueue;
+import java.util.concurrent.TimeUnit;
 
 import graph_viz.GraphVisualizer;
 import test_data.utilities.Threads;
@@ -13,6 +14,14 @@ import test_data.utilities.Threads;
 public class Adhoc {
 
     @Test
+    public void timeLoop() {
+        Stream<Integer> s = Stream.just(0).timedLoop(entry -> entry.map(i -> i + 1), 1, TimeUnit.DAYS);
+        GraphVisualizer.display(s);
+
+        Threads.sleep();
+    }
+
+//    @Test
     public void loop() {
         Stream<Integer> s = Stream.just(0).loop(entry -> entry.map(i -> i + 1));
         GraphVisualizer.display(s);

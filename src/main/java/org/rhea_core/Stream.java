@@ -215,6 +215,7 @@ public class Stream<T> implements Serializable {
         return new Stream<>(graph, graph.getConnectNode());
     }
     // =======================================================
+
     /**
      * Feedback Loop
      */
@@ -229,6 +230,24 @@ public class Stream<T> implements Serializable {
 
         return new Stream<>(newGraph, newGraph.getConnectNode());
     }
+
+    public Stream<T> timedLoop(Func1<Stream<T>, Stream<T>> streamFunc, long time, TimeUnit timeUnit) {
+        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
+        graph.addVertex(merge);
+        graph.attach(merge, toConnect);
+        toConnect = merge;
+        FlowGraph newGraph = streamFunc.call(this).withTimestep(time, timeUnit).getGraph();
+        newGraph.addEdge(newGraph.getConnectNode(), merge);
+        newGraph.setConnectNode(merge);
+
+        return new Stream<>(newGraph, newGraph.getConnectNode());
+    }
+
+    public Stream<T> withTimestep(long time, TimeUnit timeUnit) {
+        Stream<Long> pace = interval(time, timeUnit);
+        return Stream.zip(this, pace, (i, t) -> i);
+    }
+
     /** @see <a href="http://reactivex.io/RxJava/javadoc/rx/Observable.html#map(rx.functions.Func1)">rx-java.map</a> */
     public <R> Stream<R> map(Func1<? super T, ? extends R> mapper) {
         return attach(new MapExpr<>(IdMinter.next(), mapper));
