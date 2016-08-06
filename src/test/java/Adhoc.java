@@ -13,7 +13,7 @@ import test_data.utilities.Threads;
  */
 public class Adhoc {
 
-    @Test
+//    @Test
     public void timeLoop() {
         Stream<Integer> s = Stream.just(0).timedLoop(entry -> entry.map(i -> i + 1), 1, TimeUnit.DAYS);
         GraphVisualizer.display(s);
@@ -21,9 +21,9 @@ public class Adhoc {
         Threads.sleep();
     }
 
-//    @Test
+    @Test
     public void loop() {
-        Stream<Integer> s = Stream.just(0).loop(entry -> entry.map(i -> i + 1));
+        Stream<Integer> s = Stream.just(0).loopN(entry -> entry.map(i -> i + 1), 10);
         GraphVisualizer.display(s);
 
         Threads.sleep();
