@@ -1,5 +1,6 @@
 package org.rhea_core.optimization.optimizers;
 
+import org.rhea_core.Stream;
 import org.rhea_core.internal.expressions.SingleInputExpr;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.combining.ConcatMultiExpr;
@@ -51,11 +52,13 @@ public class NodeMerger implements Optimizer {
 
                 // never -> singleInput
                 if (succ instanceof SingleInputExpr) {
+                    if (Stream.DEBUG) System.out.println("never -> singleInput");
                     graph.merge(vertex, succ, new NeverExpr());
                     return true;
                 }
                 // never -> zip
                 else if (succ instanceof ZipExpr) {
+                    if (Stream.DEBUG) System.out.println("never -> zip");
                     List<Transformer> pred = graph.predecessors(succ);
                     if (pred.stream().anyMatch(n -> !graph.singular(n)))
                         continue;
@@ -68,6 +71,7 @@ public class NodeMerger implements Optimizer {
                 }
                 // never -> merge
                 else if (succ instanceof MergeMultiExpr) {
+                    if (Stream.DEBUG) System.out.println("never -> merge");
                     List<Transformer> pred = graph.predecessors(succ);
                     if (pred.size() == 2) continue;
                     else {
@@ -77,6 +81,7 @@ public class NodeMerger implements Optimizer {
                 }
                 // never -> concat
                 else if (succ instanceof ConcatMultiExpr) {
+                    if (Stream.DEBUG) System.out.println("never -> concat");
                     List<Transformer> pred = graph.predecessors(succ);
                     if (pred.stream().anyMatch(n -> !graph.singular(n)))
                         continue;
@@ -94,7 +99,7 @@ public class NodeMerger implements Optimizer {
             // map -> zip
             if (!(vertex instanceof ZipExpr))
                 continue;
-
+            if (Stream.DEBUG) System.out.println("map -> zip");
             ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> zip = (ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R>) vertex;
             int args = zip.getArgumentNo();
 
@@ -111,7 +116,7 @@ public class NodeMerger implements Optimizer {
                 continue;
 
             Func1 f1=null,f2=null,f3=null,f4=null,f5=null,f6=null,f7=null,f8=null,f9=null;
-            ZipExpr<X1,X2,X3,X4,X5,X6,X7,X8,X9,R> newZip = new ZipExpr<>(IdMinter.next(), zip.type);
+            ZipExpr<X1,X2,X3,X4,X5,X6,X7,X8,X9,R> newZip = new ZipExpr<>(zip.type);
             graph.addVertex(newZip);
 
             for (int i = 0; i < args; i++) {
@@ -183,10 +188,13 @@ public class NodeMerger implements Optimizer {
             Transformer merged = null;
 
             // map -> map
-            if ((source instanceof MapExpr) && (target instanceof MapExpr) && singular)
-                merged = new MapExpr(IdMinter.next(), i -> ((MapExpr) target).getMapper().call(((MapExpr) source).getMapper().call(i)));
+            if ((source instanceof MapExpr) && (target instanceof MapExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("map -> map");
+                merged = new MapExpr(i -> ((MapExpr) target).getMapper().call(((MapExpr) source).getMapper().call(i)));
+            }
             // from -> map
             else if ((source instanceof FromExpr) && (target instanceof MapExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("from -> map");
                 Func1<? super T, ? extends R> func = ((MapExpr<? super T, ? extends R>) target).getMapper();
                 List newCollection = new ArrayList<>();
                 for (T item : ((FromExpr<? extends T>) source).getCollection())
@@ -195,6 +203,7 @@ public class NodeMerger implements Optimizer {
             }
             // from -> repeat
             else if ((source instanceof FromExpr) && (target instanceof RepeatExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("from -> repeat");
                 int count = ((RepeatExpr) target).getCount();
                 if (count == -1) continue;
                 List collection = new ArrayList<>();
@@ -204,42 +213,49 @@ public class NodeMerger implements Optimizer {
                 merged = new FromExpr(newCollection);
             }
             // map -> filter
-            else if ((source instanceof MapExpr) && (target instanceof FilterExpr) && singular)
+            else if ((source instanceof MapExpr) && (target instanceof FilterExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("map -> filter");
                 merged = new FilterMapExpr(((MapExpr) source).getMapper(), ((FilterExpr) target).getPredicate());
+            }
             // map -> exists
-            else if ((source instanceof MapExpr) && (target instanceof ExistsExpr) && singular)
+            else if ((source instanceof MapExpr) && (target instanceof ExistsExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("map -> exists");
                 merged = new ExistsExpr(i -> ((Boolean) ((ExistsExpr) target).getPredicate().call(((MapExpr) source).getMapper().call(i))));
+            }
             // filter -> exists
-            else if ((source instanceof FilterExpr) && (target instanceof ExistsExpr) && singular)
+            else if ((source instanceof FilterExpr) && (target instanceof ExistsExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("filter -> exists");
                 merged = new ExistsExpr(i -> (Boolean) ((FilterExpr) source).getPredicate().call(i)
                         && (Boolean) ((ExistsExpr) target).getPredicate().call(i));
+            }
             // zip -> map
             else if ((source instanceof ZipExpr) && (target instanceof MapExpr) && singular) {
+                if (Stream.DEBUG) System.out.println("zip -> map");
                 ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9, R1> zip = (ZipExpr) source;
                 Func1<R1, R2> fun = ((MapExpr) target).getMapper();
                 if (zip.combiner9 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4, i5, i6, i7, i8, i9) -> fun.call(zip.combiner9.call(i1, i2, i3, i4, i5, i6, i7, i8, i9)));
                 if (zip.combiner8 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4, i5, i6, i7, i8) -> fun.call(zip.combiner8.call(i1, i2, i3, i4, i5, i6, i7, i8)));
                 if (zip.combiner7 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4, i5, i6, i7) -> fun.call(zip.combiner7.call(i1, i2, i3, i4, i5, i6, i7)));
                 if (zip.combiner6 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4, i5, i6) -> fun.call(zip.combiner6.call(i1, i2, i3, i4, i5, i6)));
                 if (zip.combiner5 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4, i5) -> fun.call(zip.combiner5.call(i1, i2, i3, i4, i5)));
                 if (zip.combiner4 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3, i4) -> fun.call(zip.combiner4.call(i1, i2, i3, i4)));
                 if (zip.combiner3 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2, i3) -> fun.call(zip.combiner3.call(i1, i2, i3)));
                 if (zip.combiner2 != null)
-                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(IdMinter.next(), zip.type,
+                    merged = new ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R2>(zip.type,
                             (i1, i2) -> fun.call(zip.combiner2.call(i1, i2)));
             }
             else

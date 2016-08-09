@@ -2,16 +2,12 @@ package org.rhea_core.internal.expressions.combining;
 
 import org.rhea_core.internal.expressions.MultipleInputExpr;
 import org.rhea_core.internal.expressions.Transformer;
-import org.rhea_core.internal.expressions.creation.FromExpr;
 import org.rhea_core.util.functions.*;
-
-import java.util.Iterator;
 
 /**
  * @author Orestis Melkonian
  */
-public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr<Object> implements Transformer<R> {
-    public int id;
+public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr implements Transformer<R> {
     public String type;
 
     public Func2<? super T1, ? super T2, ? extends R> combiner2;
@@ -23,51 +19,41 @@ public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr<Obj
     public Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner8;
     public Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner9;
 
-    private ZipExpr(int id) {
-        this.id = id;
+    private ZipExpr() {
     }
 
-    public ZipExpr(int id, String type) {
-        this(id);
+    public ZipExpr(String type) {
         this.type = type;
     }
-    public ZipExpr(int id, String type, Func2<? super T1, ? super T2, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func2<? super T1, ? super T2, ? extends R> combiner) {
         this.type = type;
         combiner2 = combiner;
     }
-    public ZipExpr(int id, String type, Func3<? super T1, ? super T2, ? super T3, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func3<? super T1, ? super T2, ? super T3, ? extends R> combiner) {
         this.type = type;
         combiner3 = combiner;
     }
-    public ZipExpr(int id, String type, Func4<? super T1, ? super T2, ? super T3, ? super T4, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func4<? super T1, ? super T2, ? super T3, ? super T4, ? extends R> combiner) {
         this.type = type;
         combiner4 = combiner;
     }
-    public ZipExpr(int id, String type, Func5<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func5<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? extends R> combiner) {
         this.type = type;
         combiner5 = combiner;
     }
-    public ZipExpr(int id, String type, Func6<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func6<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? extends R> combiner) {
         this.type = type;
         combiner6 = combiner;
     }
-    public ZipExpr(int id, String type, Func7<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func7<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? extends R> combiner) {
         this.type = type;
         combiner7 = combiner;
     }
-    public ZipExpr(int id, String type, Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func8<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? extends R> combiner) {
         this.type = type;
         combiner8 = combiner;
     }
-    public ZipExpr(int id, String type, Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner) {
-        this(id);
+    public ZipExpr(String type, Func9<? super T1, ? super T2, ? super T3, ? super T4, ? super T5, ? super T6, ? super T7, ? super T8, ? super T9, ? extends R> combiner) {
         this.type = type;
         combiner9 = combiner;
     }
@@ -92,27 +78,15 @@ public class ZipExpr<T1,T2,T3,T4,T5,T6,T7,T8,T9,R> extends MultipleInputExpr<Obj
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if ((obj == null) || !(obj instanceof ZipExpr))
-            return false;
-        return id == ((ZipExpr) obj).id;
-    }
-
-    @Override
     public Transformer<R> clone() {
-        if (combiner9 != null) return new ZipExpr<>(id, type, combiner9);
-        if (combiner8 != null) return new ZipExpr<>(id, type, combiner8);
-        if (combiner7 != null) return new ZipExpr<>(id, type, combiner7);
-        if (combiner6 != null) return new ZipExpr<>(id, type, combiner6);
-        if (combiner5 != null) return new ZipExpr<>(id, type, combiner5);
-        if (combiner4 != null) return new ZipExpr<>(id, type, combiner4);
-        if (combiner3 != null) return new ZipExpr<>(id, type, combiner3);
-        return new ZipExpr<>(id, type, combiner2);
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + id;
+        if (combiner9 != null) return (Transformer<R>) new ZipExpr<>(type, combiner9).withID(id);
+        if (combiner8 != null) return (Transformer<R>) new ZipExpr<>(type, combiner8).withID(id);
+        if (combiner7 != null) return (Transformer<R>) new ZipExpr<>(type, combiner7).withID(id);
+        if (combiner6 != null) return (Transformer<R>) new ZipExpr<>(type, combiner6).withID(id);
+        if (combiner5 != null) return (Transformer<R>) new ZipExpr<>(type, combiner5).withID(id);
+        if (combiner4 != null) return (Transformer<R>) new ZipExpr<>(type, combiner4).withID(id);
+        if (combiner3 != null) return (Transformer<R>) new ZipExpr<>(type, combiner3).withID(id);
+        return (Transformer<R>) new ZipExpr<>(type, combiner2).withID(id);
     }
 }
 

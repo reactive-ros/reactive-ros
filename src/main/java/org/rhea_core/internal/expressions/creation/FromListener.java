@@ -7,7 +7,7 @@ import org.rhea_core.io.Listener;
 /**
  * @author Orestis Melkonian
  */
-public class FromListener<T> extends NoInputExpr<T> implements Transformer<T> {
+public class FromListener<T> extends NoInputExpr implements Transformer<T> {
     private Listener<? extends T> source;
 
     public FromListener(Listener<? extends T> source) {

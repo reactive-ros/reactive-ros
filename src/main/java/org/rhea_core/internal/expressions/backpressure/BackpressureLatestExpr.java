@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class BackpressureLatestExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class BackpressureLatestExpr<T> extends SingleInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new BackpressureLatestExpr<>();

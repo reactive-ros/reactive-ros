@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Action1;
 /**
  * @author Orestis Melkonian
  */
-public class Action1Expr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class Action1Expr<T> extends SingleInputExpr implements Transformer<T> {
     private Action1<Throwable> onErrorAction;
     private Action1<? super T> onNextAction;
     private Action1<Long> onRequestAction;

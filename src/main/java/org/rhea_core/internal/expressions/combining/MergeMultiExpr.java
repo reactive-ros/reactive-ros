@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class MergeMultiExpr<T> extends MultipleInputExpr<T> implements Transformer<T> {
+public class MergeMultiExpr<T> extends MultipleInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new MergeMultiExpr<>();

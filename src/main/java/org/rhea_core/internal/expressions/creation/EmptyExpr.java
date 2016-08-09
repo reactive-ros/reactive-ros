@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class EmptyExpr<T> extends NoInputExpr<T> implements Transformer<T> {
+public class EmptyExpr<T> extends NoInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new EmptyExpr<>();

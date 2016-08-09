@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Func1;
 /**
  * @author Orestis Melkonian
  */
-public class FilterExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class FilterExpr<T> extends SingleInputExpr implements Transformer<T> {
     private Func1<? super T, Boolean> predicate;
 
     public FilterExpr(Func1<? super T, Boolean> predicate) {

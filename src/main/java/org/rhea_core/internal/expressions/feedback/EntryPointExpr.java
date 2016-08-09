@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class EntryPointExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class EntryPointExpr<T> extends SingleInputExpr implements Transformer<T> {
     @Override
     public Transformer clone() {
         return new EntryPointExpr<>();

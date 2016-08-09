@@ -7,7 +7,7 @@ import org.rhea_core.internal.Notification;
 /**
  * @author Orestis Melkonian
  */
-public class MaterializeExpr<T> extends SingleInputExpr<T> implements Transformer<Notification<T>> {
+public class MaterializeExpr<T> extends SingleInputExpr implements Transformer<Notification<T>> {
     @Override
     public Transformer<Notification<T>> clone() {
         return new MaterializeExpr<>();

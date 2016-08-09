@@ -8,7 +8,7 @@ import org.rhea_core.util.functions.Func0;
 /**
  * @author Orestis Melkonian
  */
-public class DeferExpr<T> extends NoInputExpr<T> implements Transformer<T> {
+public class DeferExpr<T> extends NoInputExpr implements Transformer<T> {
     private Func0<Stream<T>> streamFactory;
 
     public DeferExpr(Func0<Stream<T>> streamFactory) {

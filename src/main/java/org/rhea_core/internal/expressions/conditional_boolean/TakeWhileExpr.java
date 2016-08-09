@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Func1;
 /**
  * @author Orestis Melkonian
  */
-public class TakeWhileExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class TakeWhileExpr<T> extends SingleInputExpr implements Transformer<T> {
     private Func1<? super T, Boolean> predicate;
 
     public TakeWhileExpr(Func1<? super T, Boolean> predicate) {

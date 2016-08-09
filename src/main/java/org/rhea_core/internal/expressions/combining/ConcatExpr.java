@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class ConcatExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class ConcatExpr<T> extends SingleInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new ConcatExpr<>();

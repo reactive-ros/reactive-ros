@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Orestis Melkonian
  */
-public class SampleExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class SampleExpr<T> extends SingleInputExpr implements Transformer<T> {
     private long time;
     private TimeUnit timeUnit;
 

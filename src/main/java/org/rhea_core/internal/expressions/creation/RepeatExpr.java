@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class RepeatExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class RepeatExpr<T> extends SingleInputExpr implements Transformer<T> {
     private int count;
 
     public RepeatExpr(int count) {

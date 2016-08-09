@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author Orestis Melkonian
  */
-public class FromExpr<T> extends NoInputExpr<T> implements Transformer<T> {
+public class FromExpr<T> extends NoInputExpr implements Transformer<T> {
     private Iterable<? extends T> collection;
 
     public FromExpr(Iterable<? extends T> collection) {

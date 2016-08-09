@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Orestis Melkonian
  */
-public class BufferExpr<T> extends SingleInputExpr<T> implements Transformer<List<T>> {
+public class BufferExpr<T> extends SingleInputExpr implements Transformer<List<T>> {
     private int count;
     private long timespan;
     private TimeUnit unit;

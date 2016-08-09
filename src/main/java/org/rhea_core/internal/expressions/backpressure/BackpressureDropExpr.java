@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Action1;
 /**
  * @author Orestis Melkonian
  */
-public class BackpressureDropExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class BackpressureDropExpr<T> extends SingleInputExpr implements Transformer<T> {
     private Action1<? super T> onDrop;
 
     public BackpressureDropExpr(Action1<? super T> onDrop) {

@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Action0;
 /**
  * @author Orestis Melkonian
  */
-public class Action0Expr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class Action0Expr<T> extends SingleInputExpr implements Transformer<T> {
     private Action0 action;
     private String when;
 

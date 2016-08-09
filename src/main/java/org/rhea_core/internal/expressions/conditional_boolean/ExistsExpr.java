@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Func1;
 /**
  * @author Orestis Melkonian
  */
-public class ExistsExpr<T> extends SingleInputExpr<T> implements Transformer<Boolean> {
+public class ExistsExpr<T> extends SingleInputExpr implements Transformer<Boolean> {
     private Func1<? super T, Boolean> predicate;
 
     public ExistsExpr(Func1<? super T, Boolean> predicate) {

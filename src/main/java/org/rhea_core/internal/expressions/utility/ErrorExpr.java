@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class ErrorExpr<T> extends NoInputExpr<T> implements Transformer<T> {
+public class ErrorExpr<T> extends NoInputExpr implements Transformer<T> {
     private Throwable t;
 
     public ErrorExpr(Throwable t) {

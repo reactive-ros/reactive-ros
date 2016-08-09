@@ -7,7 +7,7 @@ import org.rhea_core.util.functions.Action0;
 /**
  * @author Orestis Melkonian
  */
-public class BackpressureBufferExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class BackpressureBufferExpr<T> extends SingleInputExpr implements Transformer<T> {
     private long capacity;
     private Action0 onOverflow;
 

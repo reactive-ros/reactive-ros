@@ -7,7 +7,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class TakeUntilExpr <T, U> extends SingleInputExpr<T> implements Transformer<T> {
+public class TakeUntilExpr <T, U> extends SingleInputExpr implements Transformer<T> {
     private Stream<U> other;
 
     public TakeUntilExpr(Stream<U> other) {

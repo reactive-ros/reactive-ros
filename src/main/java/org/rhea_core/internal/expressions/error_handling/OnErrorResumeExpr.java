@@ -7,7 +7,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class OnErrorResumeExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class OnErrorResumeExpr<T> extends SingleInputExpr implements Transformer<T> {
     private Stream<? extends T> resumeStream;
 
     public OnErrorResumeExpr(Stream<? extends T> resumeStream) {

@@ -1,10 +1,6 @@
 package org.rhea_core.util;
 
-import org.omg.CORBA.Object;
-import org.rhea_core.util.functions.Function;
-
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class that generates unique identifiers in a thread-safe manner.
@@ -12,12 +8,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class IdMinter {
 
-    static int current_id = 0;
-    static final Lock lock = new ReentrantLock();
+    static final AtomicInteger gen = new AtomicInteger(0);
 
     public static int next() {
-        synchronized (lock) {
-            return current_id++;
-        }
+        return gen.getAndIncrement();
     }
 }

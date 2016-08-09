@@ -7,7 +7,7 @@ import org.rhea_core.io.Source;
 /**
  * @author Orestis Melkonian
  */
-public class FromSource<T> extends NoInputExpr<T> implements Transformer<T> {
+public class FromSource<T> extends NoInputExpr implements Transformer<T> {
     private Source<T> source;
 
     public FromSource(Source<T> source) {

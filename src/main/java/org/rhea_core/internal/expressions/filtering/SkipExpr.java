@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class SkipExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class SkipExpr<T> extends SingleInputExpr implements Transformer<T> {
     private int count;
 
     public SkipExpr(int count) {

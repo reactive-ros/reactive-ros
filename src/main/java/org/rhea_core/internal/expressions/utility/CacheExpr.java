@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class CacheExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class CacheExpr<T> extends SingleInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new CacheExpr<>();

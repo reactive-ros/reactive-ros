@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Orestis Melkonian
  */
-public class DelayExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class DelayExpr<T> extends SingleInputExpr implements Transformer<T> {
     private long delay;
     private TimeUnit unit;
 

@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Orestis Melkonian
  */
-public class IntervalExpr extends NoInputExpr<Long> implements Transformer<Long> {
+public class IntervalExpr extends NoInputExpr implements Transformer<Long> {
     private long interval;
     private TimeUnit unit;
 

@@ -1,5 +1,6 @@
 package org.rhea_core.optimization.optimizers;
 
+import org.rhea_core.Stream;
 import org.rhea_core.internal.expressions.Transformer;
 import org.rhea_core.internal.expressions.combining.ConcatMultiExpr;
 import org.rhea_core.internal.expressions.combining.MergeMultiExpr;
@@ -30,19 +31,24 @@ public class ProactiveFiltering implements Optimizer {
                 if (((source instanceof MapExpr) && (target instanceof SkipExpr))
                         || ((source instanceof MapExpr) && (target instanceof DistinctExpr))
                         || ((source instanceof MapExpr) && (target instanceof TakeExpr))) {
+                    if (Stream.DEBUG) System.out.println("map -> take|skip|distinct");
                     graph.reorder(source, target);
                     changed = true;
                 }
                 // map -> filter
                 else if ((source instanceof MapExpr) && (target instanceof FilterExpr)) {
+                    if (Stream.DEBUG) System.out.println("map -> filter");
                     MapExpr map = (MapExpr) source;
                     FilterExpr filter = (FilterExpr) target;
-                    graph.reorder(source, target, map::clone, () -> new FilterExpr<>(i -> ((Boolean) filter.getPredicate().call(map.getMapper().call(i)))));
+                    graph.reorder(source, target, map::clone,
+                        () -> new FilterExpr<>(i -> ((Boolean) filter.getPredicate().call(map.getMapper().call(i))))
+                    );
                     changed = true;
                 }
                 // concat|merge -> distinct|filter
                 else if (((source instanceof ConcatMultiExpr) || (source instanceof MergeMultiExpr))
                         && ((target instanceof DistinctExpr) || (target instanceof FilterExpr))) {
+                    if (Stream.DEBUG) System.out.println("concat|merge -> distinct|filter");
                     for (Transformer pred : graph.predecessors(source)) {
                         graph.removeEdge(pred, source);
                         Transformer distinctClone = target.clone();

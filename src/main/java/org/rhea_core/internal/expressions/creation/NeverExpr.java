@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.Transformer;
 /**
  * @author Orestis Melkonian
  */
-public class NeverExpr<T> extends NoInputExpr<T> implements Transformer<T> {
+public class NeverExpr<T> extends NoInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new NeverExpr<>();

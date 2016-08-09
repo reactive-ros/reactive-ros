@@ -6,7 +6,7 @@ import org.rhea_core.internal.expressions.SingleInputExpr;
 /**
  * @author Orestis Melkonian
  */
-public class DistinctExpr<T> extends SingleInputExpr<T> implements Transformer<T> {
+public class DistinctExpr<T> extends SingleInputExpr implements Transformer<T> {
     @Override
     public Transformer<T> clone() {
         return new DistinctExpr<>();

@@ -10,7 +10,7 @@ import org.rhea_core.util.functions.Func1;
 /**
  * @author Orestis Melkonian
  */
-public class UsingExpr<T, Resource> extends NoInputExpr<T> implements Transformer<T> {
+public class UsingExpr<T, Resource> extends NoInputExpr implements Transformer<T> {
     private Func0<Resource> resourceFactory;
     private Func1<? super Resource,? extends Stream<? extends T>> streamFactory;
     private Action1<? super Resource> disposeAction;
