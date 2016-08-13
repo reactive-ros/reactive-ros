@@ -1,6 +1,11 @@
 import org.javatuples.Pair;
 import org.junit.Test;
 import org.rhea_core.Stream;
+import org.rhea_core.internal.expressions.Transformer;
+import org.rhea_core.internal.expressions.combining.ZipExpr;
+import org.rhea_core.internal.graph.FlowGraph;
+import org.rhea_core.optimization.OptimizationStrategy;
+import org.rhea_core.optimization.optimizers.NodeMerger;
 
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
@@ -22,6 +27,27 @@ public class Adhoc {
     }
 
     @Test
+    public void zip() {
+        // TODO add use-case
+        Stream s = Stream.zip(
+            Stream.range(0, 1).map(i -> i + 1),
+            Stream.range(10, 1).map(i -> i + 1),
+            (i1, i2) -> i1 + i2
+        );
+        FlowGraph g = s.getGraph();
+        new NodeMerger(1).optimize(g);
+
+        for (Transformer t : g.vertices())
+            if (t instanceof ZipExpr) {
+                ZipExpr z = (ZipExpr) t;
+                System.out.println(((ZipExpr) t).combiner2.call(1, 2));
+            }
+        GraphVisualizer.displayAt(s.getGraph(), 100, 0);
+
+        Threads.sleep();
+    }
+
+//    @Test
     public void loop() {
         Stream<Integer> s = Stream.just(0).loopN(entry -> entry.map(i -> i + 1), 10);
         GraphVisualizer.display(s);
