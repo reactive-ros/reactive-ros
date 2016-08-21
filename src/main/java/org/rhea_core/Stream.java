@@ -232,15 +232,7 @@ public class Stream<T> implements Serializable {
     }
 
     public Stream<T> loopN(Func1<Stream<T>, Stream<T>> streamFunc, int N) {
-        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
-        graph.addVertex(merge);
-        graph.attach(merge, toConnect);
-        toConnect = merge;
-        FlowGraph newGraph = streamFunc.call(this.take(N)).getGraph();
-        newGraph.addEdge(newGraph.getConnectNode(), merge);
-        newGraph.setConnectNode(merge);
-
-        return new Stream<>(newGraph, newGraph.getConnectNode());
+        return loop(streamFunc).take(N);
     }
 
     public Stream<T> timedLoop(Func1<Stream<T>, Stream<T>> streamFunc, long time, TimeUnit timeUnit) {
