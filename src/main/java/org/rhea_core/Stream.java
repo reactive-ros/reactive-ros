@@ -694,7 +694,8 @@ public class Stream<T> implements Serializable {
         }
 
         // Optimize
-        optimizationStrategy.optimize(graph);
+        if (optimizationStrategy != null)
+            optimizationStrategy.optimize(graph);
 
         // Evaluate
         distributionStrategy.distribute(new Stream(graph, graph.getConnectNode()), output);
