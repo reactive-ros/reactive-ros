@@ -73,11 +73,11 @@ public class Tester {
 
         assert m1 == g.getConnectNode();
 
-        GraphVisualizer.display(g);
-        Threads.sleep();
+        // GraphVisualizer.display(g);
+        // Threads.sleep();
     }
 
-//    @Test
+   // @Test
     public void serialization() {
         java.util.stream.Stream.concat(
                 Collections.streams().stream(),
@@ -124,8 +124,8 @@ public class Tester {
 
         GraphVisualizer.displayAt(s, 0, 0);
         new ProactiveFiltering().optimize(s.getGraph());
-        GraphVisualizer.displayAt(s, 500, 0);
 
+        GraphVisualizer.displayAt(s, 500, 0);
         Threads.sleep();
     }
 
@@ -142,8 +142,8 @@ public class Tester {
 
         GraphVisualizer.displayAt(s, 0, 0);
         new NodeMerger(1).optimize(s.getGraph());
-        GraphVisualizer.displayAt(s, 500, 0);
 
+        GraphVisualizer.displayAt(s, 500, 0);
         Threads.sleep();
     }
 }

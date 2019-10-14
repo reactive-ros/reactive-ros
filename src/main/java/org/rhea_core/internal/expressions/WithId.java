@@ -25,5 +25,5 @@ public abstract class WithId {
         if ((other == null) || !(other instanceof WithId))
             return false;
         return id == ((WithId) other).id;
-    }     
+    }
 }

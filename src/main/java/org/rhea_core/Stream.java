@@ -33,6 +33,7 @@ import org.rhea_core.internal.expressions.error_handling.OnErrorResumeExpr;
 import org.rhea_core.internal.expressions.error_handling.OnErrorReturnExpr;
 import org.rhea_core.internal.expressions.error_handling.RetryExpr;
 import org.rhea_core.internal.expressions.feedback.EntryPointExpr;
+import org.rhea_core.internal.expressions.feedback.ExitPointExpr;
 import org.rhea_core.internal.expressions.filtering.DistinctExpr;
 import org.rhea_core.internal.expressions.filtering.FilterExpr;
 import org.rhea_core.internal.expressions.filtering.SkipExpr;
@@ -87,6 +88,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.jgrapht.Graphs;
+
 /**
  * The basic class used by an end-user of this API. Represents a stream of data and exposes multiple
  * operators to compose complex dataflows.
@@ -125,6 +128,11 @@ public class Stream<T> implements Serializable {
      * The {@link org.rhea_core.optimization.OptimizationStrategy} to use.
      */
     public static OptimizationStrategy optimizationStrategy = new DefaultOptimizationStrategy(Runtime.getRuntime().availableProcessors());
+
+    public Stream(FlowGraph graph) {
+        this.graph = graph;
+        this.toConnect = graph.getConnectNode();
+    }
 
     public Stream(FlowGraph graph, Transformer toConnect) {
         this.graph = graph;
@@ -220,15 +228,29 @@ public class Stream<T> implements Serializable {
      * Feedback Loop
      */
     public Stream<T> loop(Func1<Stream<T>, Stream<T>> streamFunc) {
-        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
-        graph.addVertex(merge);
-        graph.attach(merge, toConnect);
-        toConnect = merge;
-        FlowGraph newGraph = streamFunc.call(this).getGraph();
-        newGraph.addEdge(newGraph.getConnectNode(), merge);
-        newGraph.setConnectNode(merge);
+        FlowGraph graph = streamFunc.call(entry()).getGraph();
+        Transformer<T> entry = graph.getEntryPoint();
+        Transformer<T> exit = new ExitPointExpr<>();
 
-        return new Stream<>(newGraph, newGraph.getConnectNode());
+        ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
+        this.graph.attachMulti(merge);
+        graph.attachMulti(merge);
+        Graphs.addAllVertices(this.getGraph(), graph.vertexSet());
+        Graphs.addAllEdges(this.getGraph(), graph, graph.edgeSet());
+
+        this.graph.attachMulti(exit);
+        this.graph.addEdge(merge, entry);
+        return new Stream<>(this.graph);
+
+        // ConcatMultiExpr<T> merge = new ConcatMultiExpr<>();
+        // graph.addVertex(merge);
+        // graph.attach(merge, toConnect);
+        // toConnect = merge;
+        // FlowGraph newGraph = streamFunc.call(this).getGraph();
+        // newGraph.addEdge(newGraph.getConnectNode(), merge);
+        // newGraph.setConnectNode(merge);
+
+        // return new Stream<>(newGraph, newGraph.getConnectNode());
     }
 
     public Stream<T> loopN(Func1<Stream<T>, Stream<T>> streamFunc, int N) {
@@ -687,13 +709,15 @@ public class Stream<T> implements Serializable {
      *  Evaluation
      */
     private void subscribe(Output output) {
-        if (distributionStrategy == null) {
-            if (evaluationStrategy == null)
-                throw new RuntimeException("DistributionStrategy or EvaluationStrategy not set.");
-            distributionStrategy = new SingleMachineDistributionStrategy(evaluationStrategy);
-        }
+        // Evaluation (required)
+        if (evaluationStrategy == null)
+            throw new RuntimeException("EvaluationStrategy not set.");
 
-        // Optimize
+        // Distribution (optional)
+        if (distributionStrategy == null)
+            distributionStrategy = new SingleMachineDistributionStrategy(evaluationStrategy);
+
+        // Optimize (optional)
         if (optimizationStrategy != null)
             optimizationStrategy.optimize(graph);
 

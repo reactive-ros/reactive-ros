@@ -6,6 +6,7 @@ import org.rhea_core.internal.expressions.combining.ZipExpr;
 import org.rhea_core.internal.graph.FlowGraph;
 import org.rhea_core.optimization.OptimizationStrategy;
 import org.rhea_core.optimization.optimizers.NodeMerger;
+import rx_eval.RxjavaEvaluationStrategy;
 
 import java.util.PriorityQueue;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ public class Adhoc {
         Threads.sleep();
     }
 
-    @Test
+    // @Test
     public void zip() {
         // TODO add use-case
         Stream s = Stream.zip(
@@ -42,8 +43,8 @@ public class Adhoc {
                 ZipExpr z = (ZipExpr) t;
                 System.out.println(((ZipExpr) t).combiner2.call(1, 2));
             }
-        GraphVisualizer.displayAt(s.getGraph(), 100, 0);
 
+        GraphVisualizer.displayAt(s.getGraph(), 100, 0);
         Threads.sleep();
     }
 
@@ -82,10 +83,10 @@ public class Adhoc {
         Threads.sleep();
     }
 
-//    @Test
+   @Test
     public void test() throws InterruptedException {
 
-        Stream<?> stream = Stream.using(
+        /*Stream<?> stream = Stream.using(
                 () -> new Pair<>(new PriorityQueue<Integer>(), new PriorityQueue<Integer>()),
                 queues -> Stream.just(1).loop(e -> {
                     IntStream s = new IntStream(e);
@@ -98,9 +99,21 @@ public class Adhoc {
                 .startWith(1)
                 .distinct()
                 .take(20),
-                queues -> System.out.print(""));
+                queues -> System.out.print(""));*/
 
-        GraphVisualizer.display(stream);
+        Stream.evaluationStrategy = new RxjavaEvaluationStrategy();
+        Stream<?> stream =
+            Stream.just(1).loop(s ->
+                Stream.zip(
+                    s.map(i -> i + 1),
+                    s.map(i -> i + 2),
+                    (x, y) -> x + y
+                )
+            );
+
+        stream.printAll();
+
+        // GraphVisualizer.display(stream);
         Threads.sleep();
     }
 

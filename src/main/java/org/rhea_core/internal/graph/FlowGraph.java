@@ -63,6 +63,10 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
         setConnectNode(expr);
     }
 
+    public Transformer getEntryPoint() {
+        return vertexSet().stream().filter(n -> n instanceof EntryPointExpr).collect(Collectors.toList()).get(0);
+    }
+
     // Attach output node to given vertex of the current graph
     public void attach(Transformer newConnect, Transformer toConnect) {
         assert vertices().contains(toConnect);
@@ -74,6 +78,8 @@ public class FlowGraph extends DirectedPseudograph<Transformer, SimpleEdge> {
 
     public void attachMulti(Transformer newConnect) {
         addVertex(newConnect);
+        if (toConnectMulti.isEmpty())
+            addEdge(this.toConnect, newConnect);
         for (Transformer p : toConnectMulti)
             addEdge(p, newConnect);
 
